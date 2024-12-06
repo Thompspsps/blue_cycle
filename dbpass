@@ -1,0 +1,33 @@
+credenziali mongoDB
+thompspsps
+mOQLmuSy9rP4C5G5
+
+
+user
+{
+    "email":"thompspspsp@example.com",
+    "password":"fzhe2v12f9"
+}
+
+admin
+{
+    "email":"admin@bluecycle.com",
+    "password":"12345"
+}
+
+
+machine
+{
+    "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NGRjNjliZjkzZmIxOTE0ODI4NTRiOSIsInJvbGUiOiJtYWNoaW5lIn0.ao5jQmK0cTLAcYcVcTdVl_cxT3KBRQStFq49dDxuoQs"
+}
+
+
+
+endpoint funzionanti:
+post .../userAuth
+post .../adminAuth
+get .../users
+post .../users
+
+
+

@@ -1,0 +1,1406 @@
+openapi: 3.0.0
+
+info:
+  title: Swagger BlueCycle - OpenAPI 3.0
+  description: |-
+    The BlueCycle API provides a comprehensive interface for managing user access, coupon acquisitions, and machine operations. It is designed to serve two primary roles:
+    
+    - **Users (citizens)**: Enables regular users to access and interact with coupons and manage their personal accounts.
+    - **Administrators**: Grants advanced capabilities for effective system management, including interaction with system assets such as coupons and machines.
+    
+    ### Features and Functionalities
+    
+    #### User (Citizen) Actions
+    Using the BlueCycle API, users can:
+    - Register a new account and manage their login credentials.
+    - Retrieve personal details, such as login information and points balance.
+    - Browse the store's available coupons and add items to their wishlist.
+    - Acquire new coupons and view their acquired coupons.
+    - Review detailed records of their transaction history.
+
+    #### Administrative (Admin-Only) Actions
+    Administrators can access (all user features and are also equipped with) advanced tools to manage the system effectively:
+    - Add or remove coupons from the store.
+    - Manage machine assets, including adding new machines and updating their availability status.
+    - Access detailed transaction records for both machines and users, useful for auditing and reporting purposes.
+
+    #### Machine Actions
+    Machines in the BlueCycle system can:
+    - Create and record new transactions.
+
+    ### Authorization and Access
+    Each role (user, administrator, or machine) requires the appropriate authorization to interact with specific endpoints.
+
+    This documentation provides comprehensive information for developers and users to use properly BlueCycle API, ensuring efficient operations for both regular users and system administrators.
+
+    All endpoints are categorized by the level of authorization required.
+
+  version: 1.0.5
+
+servers:
+  - url: http://api.example.com/api/v1
+    description: Production server for the BlueCycle API
+  - url: http://localhost:3000/api/v1
+    description: Local sandbox server for development and testing purposes
+
+tags:
+  - name: user actions
+    description: Operations available to regular users (citizens) and administrators
+  - name: admin actions
+    description: Operations exclusive to administrative staff for managing the system and its assets
+  - name: machine actions
+    description: Automated operations performed by machines within the system
+
+paths:
+  /auth:
+    post:
+      tags:
+      - user actions
+      - admin actions
+      summary: Allows authentication (NO AUTH)
+      description: Authenticates a user using their credentials and returns a JSON Web Token (JWT) for accessing protected endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                  description: The registered user's email address
+                password:
+                  type: string
+                  format: password
+                  description: The registered user's password
+      responses:
+        "200":
+          description: Authenticated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Authenticated successfully
+                  data:
+                    type: string
+                    description: A JWT token to be used for accessing protected API endpoints.
+                    # example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzNlNmVmMGNhNmIwMTdlYTRhOWJiYTgiLCJuYW1lIjoiVGhvbXBzcHNwcyIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzMyMjg3NjU4fQ.8c3gWzXFewBEsFD6aiS1o5KilNVR97tuX_SKuAoj-as
+                    # #alg: hs256
+                    # #key: this-is-supposed-to-be-a-secret-key
+        "400":
+          description: Invalid credentials provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Wrong Password
+                  data:
+                    example: null
+        "404":
+          description: No user matches with the provided email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not Found
+                  data:
+                    example: null
+
+  /users:
+    get:
+      security:
+      # - UserAuth: [] marari solo gli admin possono vedere tutti gli utenti
+      - AdminAuth: []
+      tags:
+        - admin actions
+      summary: Retrieve a List of all users (RIVEDERE I PARAMETRI DI FILTRO)
+      description: Fetches a comprehensive list of users registered within the system. Optional query parameters can be used to filter the results
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: false
+          description: Filter the user list by a specific user ID
+        - in: query
+          name: email
+          schema:
+            type: string
+          required: false
+          description: Filter the user list by a specific email address
+      responses:
+        "200":
+          description: Successful response containing the list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/user"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+    post:
+      tags:
+      - user actions
+      summary: Adds a new user to the system (NO AUTH, prevedere un diverso portale (POST /admins ?) per la crezione di utenti admin oppure crearne uno da usare)
+      description: Creates a new (user) account within the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  example: mangusteo@gmail.com
+                name:
+                  type: string
+                  example: Mario Rossi
+        description: Credentials provided by SpID and CieID authentication systems
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Created
+                  data:
+                    $ref: "#/components/schemas/user"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: A user with the provided email already exists
+                  data:
+                    example: null
+  /users/{id}:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      security:
+      - UserAuth: [] 
+      - AdminAuth: []
+      tags:
+        - user actions
+        - admin actions
+      summary: Retrieves a user by ID
+      description: Fetches detailed information for a specific user given its unique ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: "#/components/schemas/user"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No registered user matches the provided ID
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+  
+    patch:
+      security:
+      - UserAuth: [] 
+      - AdminAuth: []
+      tags:
+        - user actions
+        - admin actions
+      summary: Changes user's details
+      description: Allows to change user's password and update points
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - oldPassword
+              - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                # deltaPoints:
+                #   type: integer #non penso abbia molto senso
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Updated successfully
+                  data:
+                    $ref: "#/components/schemas/user"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: The current password does not match with the old one provided
+                  data:
+                    example: null
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /users/{id}/coupons:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      security:
+        - UserAuth: []
+      tags:
+        - user actions
+      summary: Retrieves a list of user's coupons
+      description: Fetches and returns a list of coupons owned by a specific user
+      parameters:
+        - in: query
+          name: used
+          required: false
+          schema:
+            type: boolean
+          description: Filter by coupon 'used' status. If not specified, returns all coupons
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/coupon"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+    post:
+      summary: Adds a new coupon to the user's profile and updates points balance
+      description: Links a new coupon to the user's account based on a specified coupon prototype
+      security:
+        - UserAuth: []
+      tags:
+        - user actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - couponPrototype
+              properties:
+                couponPrototype:
+                  type: string
+                  description: The link to the coupon prototype to add(so that a new coupon may be created)
+      responses:
+        "201":
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Added
+                  data:
+                    $ref: "#/components/schemas/coupon"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid coupon prototype ID
+                  data:
+                    example: null
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User not found
+                  data:
+                    example: null
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Insufficient points to acquire this coupon
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+
+  /users/{id}/wishlist:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    get:
+      security:
+        - UserAuth: []
+      tags:
+        - user actions
+      summary: Retrieves a user's wishlist
+      description: Fetches all coupons saved in the wishlist for the specified user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/wishlistedCoupon"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No user matches the provided ID
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+    post:
+      security:
+        - UserAuth: []
+      tags:
+        - user actions
+      summary: Adds a coupon to the user's wishlist
+      description: Adds a specified coupon (prototype) to the wishlist of the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/couponPrototype"
+      responses:
+        "201":
+          description: Coupon added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Coupon successfully added to wishlist
+                  data:
+                    $ref: "#/components/schemas/wishlistedCoupon"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid couponPrototype ID or data
+                  data:
+                    example: null
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No user matches the provided ID
+                  data:
+                    example: null
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Coupon already exists in the user's wishlist
+                  data:
+                    example: null
+
+
+
+#-----------------------------------------------------------------------------
+
+  /users/{id}/transactions:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      security:
+      - UserAuth: []
+      tags:
+      - user actions
+      summary: Fetch a user's transactions
+      description: Retrieves a list of transactions for the specified user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/transaction"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No user matches the provided ID
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /machines:
+    get:
+      security:
+      - UserAuth: []
+      - AdminAuth: []
+      tags:
+      - admin actions
+      - user actions
+      summary: Returns a list of machines
+      description: Fetches a list of all machines installed and registered in the system
+      parameters:
+      - in: query
+        name: available
+        required: false
+        schema:
+          type: boolean
+      - in: query
+        name: prossimity # vicinanza,...
+        description: Returns all machines within [range]km from the given position
+        required: false
+        schema:
+          type: object
+          properties:
+            range:
+              type: integer
+              description: In kilometers
+            position:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/machine"
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  messsage:
+                    type: string
+                    example: Malformed request syntax
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+    post:
+      security:
+      - AdminAuth: []
+      tags:
+      - admin actions
+      summary: Adds a new machine
+      description: Creates a new machine within the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - position
+              - available
+              properties:
+                location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: number
+                      format: double
+                    longitude:
+                      type: number
+                      format: double
+                available:
+                  type: boolean
+                description:
+                  type: string    
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Created
+                  data:
+                    $ref: "#/components/schemas/machine"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /machines/{id}:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Returns a machine 
+      description: Fetches detailed information for a specific machine given its unique ID
+      security:
+      - UserAuth: []
+      - AdminAuth: []
+      tags: 
+      - user actions
+      - admin actions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: "#/components/schemas/machine"
+        "404":
+          description: Machine Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No machine matches the provided ID
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+    patch:
+      summary: Updates machine's availability
+      description: Allows to change a machine availability status
+      security:
+      - AdminAuth: []
+      tags: 
+      - admin actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                available:
+                  type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: "#/components/schemas/machine"
+        "404":
+          description: Machine not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: No machine matches the provided ID
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /machines/{id}/transactions:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: not now
+      description: not now
+      security:
+      - UserAuth: []
+      tags:
+      - admin actions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/transaction"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+        
+  /store/rewards:
+    get:
+      security:
+      - AdminAuth: []
+      - UserAuth: []
+      tags:
+      - admin actions
+      - user actions
+      summary: Returns a list of coupons
+      description: Fetches a list of all coupons available on the system
+      parameters:
+      - in: query
+        name: store
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: price
+        schema:
+          type: integer
+        required: false
+      - in: query
+        name: discount
+        schema:
+          type: integer
+        required: false
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: true
+                message:
+                  type: string
+                  example: OK
+                data:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/couponPrototype"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  messsage:
+                    type: string
+                    example: Malformed request syntax
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+    post:
+      tags:
+      - admin actions
+      summary: Creates a new coupon
+      description: Adds a new coupon to the rewards store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                store:
+                  type: string
+                discount:
+                  type: integer # coupon pertentage discount
+                  minimum: 1
+                  maximum: 50
+                price:
+                  type: integer
+                description:
+                  type: string
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Created
+                  data:
+                    $ref: "#/components/schemas/coupon"
+
+
+  /store/rewards/{id}:
+    parameters:
+    - in: path
+      name: id
+      schema:
+        type: integer
+      required: true
+    delete:
+      security:
+      - AdminAuth: []
+      tags:
+      - admin actions
+      summary: Deletes an existing coupon
+      description: Removes a coupon from the rewards store
+      responses:
+        "204":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message: 
+                    type: string
+                    example: Coupon deleted
+                  data:
+                    example: null
+
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message: 
+                    type: string
+                    example: Coupon not found
+                  data:
+                    example: null
+
+  /tranasctions:
+    post:
+      security:
+      - MachineAuth: []
+      tags:
+      - machine actions
+      summary: Registers a new transacion
+      description: not now
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properites:
+                user:
+                  type: string
+                machine:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                  description: In ISO 8601 (YYYY-MM-DD) format
+                collected:
+                  type: integer
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Created
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+
+
+
+components:
+  schemas:
+    user:
+      description: Regular user
+      type: object
+      required:
+      - id
+      - code
+      - email
+      - name
+      - password
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the user within the system
+        code:
+          type: string
+          description: The unique code used for synchronization at the machine 
+        email:
+          type: string
+          description: The user's email address
+          example: mangusteo@gmail.com
+        name:
+          type: string
+          description: The full name of the user
+          example: Mario Rossi
+        password:
+          type: string
+          description: The user's password
+        points:
+          type: integer
+          description: The user's points balance.
+          default: 0
+          minimum: 0
+          example: 29
+    
+    admin:
+      dsecription: Administrator user
+      type: object
+      required:
+      - id
+      - email
+      - password
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    machine:
+      type: object
+      required:
+      - id
+      - location
+      - available
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the machine within the system.
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: double
+              description: The latitude of the machine's location.
+              example: 46.071720
+            longitude:
+              type: number
+              format: double
+              description: The longitude of the machine's location.
+              example: 11.120600
+        available:
+          type: boolean
+          description: Whether the machine is currently available.
+          example: true
+        description:
+          type: string
+
+    wishlistedCoupon:
+      type: object
+      required:
+      - id
+      - user
+      - couponPrototype
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the coupon template within the system.
+        user:
+          type: string
+          description: Link to the user
+        couponPrototype:
+          type: string
+          dscription: Link to the coupon(prototype)
+
+    couponPrototype:
+      description: This is a item available on the store. It represents a coupon pattern
+      type: object
+      required:
+      - id
+      - discount
+      - price
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the coupon template within the system
+        user:
+          type: string
+          description: Link to the user
+        store:
+          type: string
+          description: The name of the store offering the coupon
+        discount:
+          type: integer
+          description: The percentage discount offered by the coupon
+          minimum: 1
+          maximum: 50 #to be discussed
+          example: 15
+        description:
+          type: string
+          description: A description of the coupon
+
+    coupon:
+      type: object
+      required:
+      - user
+      - code
+      - discount
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the coupon
+        user:
+          type: string
+          description: Link to the user's id
+        code:
+          type: string
+          description: The coupon's unique code.
+        store:
+          type: string
+          description: The name of the store offering the coupon
+        discount:
+          type: integer
+          description: The percentage discount offered by the coupon
+          minimum: 1
+          maximum: 50 #to be discussed
+          example: 15
+        description:
+          type: string
+          description: A description of the coupon
+        used:
+          type: boolean
+          description: Whether or not the coupon has been used
+          default: false
+        expiration:
+          type: string
+          format: date
+          description: The expiration date of the coupon in ISO 8601 (YYYY-MM-DD) format
+
+    transaction:
+      type: object
+      required:
+      - machine
+      - user
+      - date
+      - collected
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the transaction
+        user:
+          type: string
+          description: The link to the user involved in the transaction
+        machine:
+          type: string
+          description: The link to the machine involved in the transaction
+        date:
+          type: string
+          format: date
+          description: The date of the transaction in ISO 8601 (YYYY-MM-DD) format
+        collected:
+          type: integer
+          description: The number of bottles collected. Each collected bottle is a point added to the user's profile
+          example: 4
+
+  securitySchemes:
+    AdminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication scheme for administrators using JSON Web Tokens (JWT)
+    UserAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication scheme for regular users using JSON Web Tokens (JWT)
+    MachineAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication scheme for machines using JSON Web Tokens (JWT)
+
+  responses:
+    UnauthorizedError:  #401
+      description: Unauthorized access. Authentication credentials are missing or invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Unauthorized
+              data:
+                example: null
+    ForbiddenError:   #403
+      description: Forbidden access. The authenticated user does not have the required permissions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: Forbidden
+              data:
+                example: null
+
+
+# about jwt
+# header
+# {
+#   "alg": "HS256",
+#   "typ": "JWT"
+# }
+
+# payload
+# {
+#   "sub": "673e6ef0ca6b017ea4a9bba8",
+#   "name": "Thompspsps",
+#   "role": "user",
+#   "exp": 1732287658 expiration date(seconds from unix epoch)
+# }
+
+# HMACSHA256(
+#   base64UrlEncode(header) + "." +
+#   base64UrlEncode(payload),
+#   this-is-supposed-to-be-a-secret-key
+# )
