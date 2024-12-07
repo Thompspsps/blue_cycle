@@ -12,21 +12,28 @@ info:
     
     #### User (Citizen) Actions
     Using the BlueCycle API, users can:
+    - Authenticate their autentity by providing their login credentials.
     - Register a new account and manage their login credentials.
     - Retrieve personal details, such as login information and points balance.
-    - Browse the store's available coupons and add items to their wishlist.
+    - Change their access credentials.
+    - List all coupons acquired through the store and add new ones.
+    - Retrieve all wishlisted coupons, add new ones and remove any wishlisted item from thei account.
+    - Browse the store's available coupons.
     - Acquire new coupons and view their acquired coupons.
     - Review detailed records of their transaction history.
-
+    - List and filter available machines nearby and fetch information for a specific one. 
+    
     #### Administrative (Admin-Only) Actions
-    Administrators can access (all user features and are also equipped with) advanced tools to manage the system effectively:
+    Administrators can access many of the features granted to the regular user (except for specific endpoint dedicated to the user account management) and are also equipped with) advanced tools to manage the system effectively:
     - Add or remove coupons from the store.
     - Manage machine assets, including adding new machines and updating their availability status.
     - Access detailed transaction records for both machines and users, useful for auditing and reporting purposes.
+    - Manage coupon listed on the store
 
     #### Machine Actions
     Machines in the BlueCycle system can:
     - Create and record new transactions.
+    - Fetch a user by id, email or code. For the purpose of the project, the machine may be able to look for a specific user given his code.
 
     ### Authorization and Access
     Each role (user, administrator, or machine) requires the appropriate authorization to interact with specific endpoints.
@@ -92,8 +99,14 @@ paths:
                     type: string
                     example: Authenticated successfully
                   data:
-                    type: string
-                    description: A JWT token to be used for accessing protected API endpoints
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        description: User ID
+                      token:
+                        type: string
+                        description: A JWT token to be used for accessing protected API endpoints
         "400":
           description: Invalid or missing credentials
           content:
@@ -167,8 +180,14 @@ paths:
                     type: string
                     example: Authenticated successfully
                   data:
-                    type: string
-                    description: A JWT token to be used for accessing protected API endpoints
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        description: Admin ID
+                      token:
+                        type: string
+                        description: A JWT token to be used for accessing protected API endpoints
         "400":
           description: Invalid or missing credentials
           content:
@@ -492,7 +511,13 @@ paths:
           required: false
           schema:
             type: boolean
-          description: Filters by coupon used status. If not specified, returns all owned coupons
+          description: Filters by coupon used status
+        - in: query
+          name: expired
+          required: false
+          schema:
+            type: boolean
+          description: Filters by coupon expiration status
       responses:
         "200":
           description: OK
@@ -617,7 +642,7 @@ paths:
                   data:
                     example: null
         "422":
-          description: Unprocessable Entity
+          description: Insufficient points to acquire this coupon
           content:
             application/json:
               schema:
@@ -628,7 +653,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Insufficient points to acquire this coupon
+                    example: Unprocessable Entity
                   data:
                     example: null
         "401":
@@ -921,6 +946,66 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         "500":
           $ref: "#/components/responses/ServerError"
+  
+  /users/{id}/transactions/collected:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      security:
+      - AdminAuth: []
+      - UserAuth: []
+      tags:
+      - user actions
+      - admin actions
+      summary: Returns all bottles deposited by a specific user
+      description: Returns the total amount of botltes deposited by the user. It is also possible to get the number of bottles deposited on a specific day
+      parameters:
+      - in: query
+        name: day
+        required: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: integer
+        "404":
+          description: No user matches the provided ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /machines:
     get:
@@ -975,21 +1060,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/machine"
-        # "400":
-        #   description: OK
-        #   content:
-        #     application/json:
-        #       schema:
-        #         type: object
-        #         properties:
-        #           success:
-        #             type: boolean
-        #             example: false
-        #           messsage:
-        #             type: string
-        #             example: Malformed request syntax
-        #           data:
-        #             example: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -1241,6 +1311,64 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         "500":
           $ref: "#/components/responses/ServerError"
+  
+  /machines/{id}/transactions/collected:
+    parameters:
+    - in: path
+      name: id
+      required: true
+      schema:
+        type: string
+    get:
+      security:
+      - AdminAuth: []
+      tags:
+      - admin actions
+      summary: Returns all collected bottles by a specific machine
+      description: Returns the total number of bottles collected by the machine. It is also possible to retrieve the number of bottles collected on a specific day
+      parameters:
+      - in: query
+        name: day
+        required: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    type: integer
+        "404":
+          description: No machine matches the provided ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "500":
+          $ref: "#/components/responses/ServerError"
         
   /couponPrototypes:
     get:
@@ -1286,21 +1414,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/couponPrototype"
-        # "400":
-        #   description: Malformed request syntax
-        #   content:
-        #     application/json:
-        #       schema:
-        #         type: object
-        #         properties:
-        #           success:
-        #             type: boolean
-        #             example: false
-        #           messsage:
-        #             type: string
-        #             example: Bad request
-        #           data:
-        #             example: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -1450,7 +1563,7 @@ paths:
       tags:
       - machine actions
       summary: Registers a new transacion
-      description: Registers a new transaction involving a user and a machine
+      description: Registers a new transaction involving a user and a machine and updates the user's points balance(if the daily quota hasn't been reached)
       requestBody:
         required: true
         content:
@@ -1467,7 +1580,7 @@ paths:
                 date:
                   type: string
                   format: date
-                  description: In ISO 8601 (DD-MM-YYYY) format
+                  description: In Unix timestamp
                 collected:
                   type: integer
       responses:
