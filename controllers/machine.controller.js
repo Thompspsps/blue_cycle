@@ -43,7 +43,7 @@ const getMachines=async (req,res,next)=>{
             res.locals.response={status:200,success:true,message:"OK",data:machines};
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -70,7 +70,7 @@ const getMachineById=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -99,7 +99,7 @@ const postMachine=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -131,7 +131,7 @@ const patchMachineById=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -163,7 +163,7 @@ const getMachineByIdTransactions=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -187,7 +187,7 @@ const getUserByIdTransactionsCollected=async(req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();

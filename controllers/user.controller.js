@@ -1,18 +1,46 @@
+// to do:
+// aggiungere la funzionalità nel model che faccia l'hash della password(invece di farlo nelle funzioni stesse, e.g. patchuserbyid)
+// risolvere il problema in patchuserbyid che restituisce la password in chiaro(ma salvata con hash nel db)
 const {User,WishlistedCoupon,Coupon,Transaction,CouponPrototype}=require("../models/bc.models");
 const {authenticateToken}=require("../scripts/tokenChecker");
 const {fetchPoints}=require("../scripts/pointsFetcher");
 const mongoose=require("mongoose");
+const bcrypt=require("bcrypt");
+require("dotenv");
+
+const {transporter,senderAddress}=require("../scripts/emailSender");
+const saltRounds=parseInt(process.env.SALT_ROUNDS)||10;
+
+// da riguardare
+const changeUserPasswordByEmail=async (req,res,next)=>{     // PATCH .../api/users/users/{userEmail}/password
+    try{
+        let tpassword=Math.random().toString(36).slice(-8);
+        let user=await User.findOneAndUpdate({email:providedEmail},{password:tpassword});
+        if(user){
+            res.locals.response={status:404,success:true,message:"OK",data:user};
+            await transporter.sendMail({
+                from: senderAddress, // sender address
+                to: user.email, // list of receivers
+                subject: "Cambio password", // Subject line
+                text: "La tua nuova password temporanea è: "+createdUser.password,
+            })
+            .then(()=>console.log("Email sent"));
+        }else
+            res.locals.response={status:404,success:false,message:"Not found",data:null};
+    }catch(err){
+        console.error(err);
+        res.locals.response={status:500,success:false,message:"Internal server error",data:null};
+    }
+};
 
 const getUsers=async (req,res,next)=>{
     try{
         if(await authenticateToken(req,res,["admin","machine"])){
-            //aggiungere il controllo del token(role admin) e filtri
             const {id:queryId,email:queryEmail,code:queryCode}=req.query;
             const filters={};
             if(queryId) filters._id=queryId;
             if(queryEmail) filters.email=queryEmail;
             if(queryCode) filters.code=queryCode;                //controllo se sono definiti i filtri
-            console.log(filters);
             let users=await User.find(filters);
             users=users.map((entry)=>{
                 return {
@@ -27,12 +55,14 @@ const getUsers=async (req,res,next)=>{
             res.locals.response={status:200,success:true,message:"OK",data:users};
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
 };
 
+
+// invio email
 const postUser=async (req,res,next)=>{
     try{
         const {email:providedEmail,name:providedName}=req.body;
@@ -42,16 +72,26 @@ const postUser=async (req,res,next)=>{
             const user=await User.findOne({email:providedEmail});
             if(!user){
                 let createdUser=new User({email:providedEmail,name:providedName});
-                createdUser=await createdUser.save();
+                // console.log(createdUser.password);
+                await createdUser.save();
                 createdUser=createdUser.toObject();
                 createdUser.self="/api/v1/users/"+createdUser._id;
                 delete createdUser._id;
+                delete createdUser.__v;
                 res.locals.response={status:201,success:true,message:"New user registered",data:createdUser};
+                await transporter.sendMail({
+                    from: senderAddress, // sender address
+                    to: providedEmail, // list of receivers
+                    subject: "Nuova registrazione", // Subject line
+                    text: "email: "+providedEmail+"\nLa tua password temporanea: "+createdUser.password,
+                })
+                .then(()=>console.log("New user created. Email sent"))
+                .catch(()=>console.log("Something went wrong"));
             }else
                 res.locals.response={status:409,success:false,message:"User already exists",data:null};
         }
     }catch(err){    //server error
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};;
     }
     next();
@@ -60,12 +100,11 @@ const postUser=async (req,res,next)=>{
 const getUserById=async (req,res,next)=>{
     try{
         const {id}=req.params;
-        console.log()
         //controllo conformità dell'id fornito
         if(!mongoose.Types.ObjectId.isValid(id))
             res.locals.response={status:400,success:false,message:"Not valid id",data:null};
         else{
-            let user=await User.findById(id);
+            let user=await User.findById(id).select("-__v");
             if(!user)
                 res.locals.response={status:404,success:false,message:"Not found",data:null};
             else{
@@ -78,7 +117,7 @@ const getUserById=async (req,res,next)=>{
             }
         }
     }catch(err){    //server error
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -96,10 +135,10 @@ const patchUserById=async (req,res,next)=>{
             else{
                 console.log(req.body);
                 const {oldPassword:providedOldPassword,newPassword:providedNewPassword}=req.body;
-                console.log(providedOldPassword," ",providedNewPassword);
-                if((providedOldPassword && providedNewPassword)&&(providedOldPassword==user.password)){
+                // console.log(providedOldPassword,providedNewPassword);
+                if((providedOldPassword && providedNewPassword)&&(bcrypt.compare(providedOldPassword,user.password))){
                     if(await authenticateToken(req,res,["user","admin"],id)){
-                        let modifiedUser=await User.findByIdAndUpdate(id,{password:providedNewPassword});
+                        let modifiedUser=await User.findByIdAndUpdate(id,{password:providedNewPassword}).select("-__v");
                         modifiedUser=modifiedUser.toObject();
                         modifiedUser.self="/api/v1/users/"+modifiedUser._id;
                         modifiedUser.password=providedNewPassword;
@@ -111,7 +150,7 @@ const patchUserById=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -130,18 +169,23 @@ const getUserByIdCoupons=async (req,res,next)=>{
             else{
                 if(await authenticateToken(req,res,["user"],id)){
                     const {used:queryUsed,expired:queryExpired}=req.query;
-                    let date;
+                    
                     let filters={};
+                    let date;
                     filters.user=id;
                     if(queryUsed==="true") filters.used=true;
-                    else if(queryUsed==="false") filters.used=true;
+                    else if(queryUsed==="false") filters.used=false;
+
+                    let coupons;
                     if(queryExpired==="true"){
                         date=Math.trunc(Date.now()/1000);
                         date-=date%86400;
-                    }
+                        console.log(date);
+                        coupons=await Coupon.find(filters).where("expiration").lt(date);
+                    }else if(queryExpired==="false")
+                        coupons=await Coupon.find(filters).where("expiration").gt(date);
                     else
-                        date=0;
-                    let coupons=await Coupon.find(filters).where("expiration").lt(date);
+                        coupons=await Coupon.find(filters);
                     coupons=coupons.map((entry)=>{
                         if(entry.expiration!=null||((entry.expiration<Date.now())==expired))
                             return{
@@ -162,7 +206,7 @@ const getUserByIdCoupons=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -186,11 +230,12 @@ const postUserByIdCoupon=async (req,res,next)=>{
                     res.locals.response={status:404,success:false,message:"Not found",data:null};
                 else{
                     if(await authenticateToken(req,res,["user"],id)){
-                        const pointsToSub=couponPrototype.price*(-1);
+                        const pointsToSub=couponPrototype.price;
                         try{
+                            console.log(user.points,couponPrototype.price);
                             if(user.points<couponPrototype.price)
                                 throw new Error("Not enough points");
-                            await User.findByIdAndUpdate(id,{$inc:{points:pointsToSub}});
+                            await User.findByIdAndUpdate(id,{$inc:{points:pointsToSub*(-1)}});
                             
                             let coupon=new Coupon({user:id,store:couponPrototype.store,discount:couponPrototype.discount,description:couponPrototype.description});
                             if(typeof(providedExpirationxpiration)==="number"&&providedExpiration>Date.now()) coupon.expiration=providedExpiration;
@@ -201,7 +246,7 @@ const postUserByIdCoupon=async (req,res,next)=>{
                             delete coupon._id;
                             res.locals.response={status:201,success:true,message:"Added",data:coupon};
                         }catch(err){
-                            console.log(err);
+                            console.error(err);
                             res.locals.response={status:422,success:false,message:"Unprocessable Entity",data:null};
                         }
                     }
@@ -209,7 +254,7 @@ const postUserByIdCoupon=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -230,7 +275,7 @@ const getUserByIdWishlistedCoupons=async (req,res,next)=>{
                         let wishlistedCoupons=await WishlistedCoupon.find({user:id});
                         wishlistedCoupons=wishlistedCoupons.map((entry)=>{
                             return{
-                                self:"/api/v1/wishlistedCoupons/"+entry.id,
+                                self:"/api/v1/users/"+id+"/wishlistedCoupons/"+entry._id,
                                 user:"/api/v1/users/"+entry.user,//oppure solo id di req
                                 couponPrototype:"/api/v1/couponPrototypes/"+entry.couponPrototype,
                             };
@@ -240,7 +285,7 @@ const getUserByIdWishlistedCoupons=async (req,res,next)=>{
                 }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -283,11 +328,36 @@ const postUserByIdWishlistedCoupon=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
 };
+
+//nuova feature
+const getUserByIdWishlistedCouponById=async (req,res,next)=>{
+    try{
+        const {userId:providedUserId,itemId:providedItemId}=req.params;
+        if(!mongoose.Types.ObjectId.isValid(providedUserId)||!mongoose.Types.ObjectId.isValid(providedItemId))
+            res.locals.response={status:400,success:false,message:"Not valid id/s",data:null};
+        else{
+            const user=await User.findById(providedUserId);
+            if(!user)
+                res.locals.response={status:404,success:false,message:"Not found",data:null};
+            if(await authenticateToken(req,res,["user"],providedUserId)){
+                const wishlistedCoupon=await WishlistedCoupon.findById(providedItemId);
+                if(!wishlistedCoupon)
+                    res.locals.response={status:404,success:false,message:"Not Found",data:null};
+                else
+                    res.locals.response={status:204,success:true,message:"OK",data:wishlistedCoupon};
+            }
+        }
+    }catch(err){
+        console.error(err);
+        res.locals.response={status:500,success:false,message:"Internal server error",data:null};
+    }
+    next();
+}
 
 
 // da ritestare ---------------------------------------------------------------------------------------------
@@ -309,7 +379,7 @@ const deleteUserByIdWishlistedCouponById=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -342,7 +412,7 @@ const getUserByIdTransactions=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -366,7 +436,7 @@ const getUserByIdTransactionsCollected=async(req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -379,10 +449,11 @@ module.exports={
     getUserById,
     patchUserById,
     getUserByIdCoupons,
-    // //getUserByIdCouponById --> da aggiungere
+    // //getUserByIdCouponById --> da aggiungere (forse)
     postUserByIdCoupon,
     getUserByIdWishlistedCoupons,
     postUserByIdWishlistedCoupon,
+    getUserByIdWishlistedCouponById,
     deleteUserByIdWishlistedCouponById,
     getUserByIdTransactions,
     getUserByIdTransactionsCollected

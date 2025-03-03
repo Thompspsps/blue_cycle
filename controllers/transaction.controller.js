@@ -25,7 +25,7 @@
 //             }
 //         }
 //     }catch(err){
-//         console.log(err);
+//         console.error(err);
 //         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
 //     }
 //     next();
@@ -95,7 +95,7 @@ const postTransaction=async(req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();

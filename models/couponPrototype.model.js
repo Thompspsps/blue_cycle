@@ -4,7 +4,8 @@ const couponPrototypeSchema=Schema(
     {
         store:{
             type: String,
-            requied: true
+            required: true,
+            trim:true
         },
         discount:{
             type: Number,
@@ -15,10 +16,11 @@ const couponPrototypeSchema=Schema(
         price:{
             type: Number,
             required: true,
-            min: 1
+            minimum: 1
         },
         description:{
-            type: String
+            type: String,
+            trim:true
         }
     }
 );

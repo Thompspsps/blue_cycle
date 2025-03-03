@@ -1,9 +1,18 @@
-//to run the application type: npm run env
-const moment=require("moment");     //package per la gestione delle date (eliminabile)
+// to do:
+// utilizzare il package bcrypt per gestire con piu' sicurezza le password
+// aggiungere un middleware separeto per la verifica del token jwt
+// cambiare la durata del token per l'utente
+// magari gestire il logging con winston (al posto di console.log)
+
+// package for date (doesn't really have a meaningfull use beside debugging(?))
+const moment=require("moment");
 
 const express=require("express");
 const app=express();
-//middleware
+
+const bcrypt=require("bcrypt");
+
+// express middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true})); //false
 app.use((req,res,next)=>{
@@ -11,10 +20,11 @@ app.use((req,res,next)=>{
     next();
 });
 
+// "cross-origin resource sharing" package
 const cors=require("cors");
 app.use(cors());
 
-//routes
+// routes
 const {userRouter,machineRouter,couponPrototypeRouter,transactionRouter}=require("./routes/bc.routes");
 app.use("/api/v1/users",(req,res,next)=>{console.log(".../users router");next();},userRouter);
 app.use("/api/v1/machines",(req,res,next)=>{console.log(".../machines router");next();},machineRouter);
@@ -22,35 +32,37 @@ app.use("/api/v1/couponPrototypes",(req,res,next)=>{console.log(".../couponProto
 app.use("/api/v1/transactions",(req,res,next)=>{console.log(".../transactions router");next();},transactionRouter);
 
 
-//mongoose
+// mongoose
 const mongoose=require("mongoose");
 const {User,Admin}=require("./models/bc.models");
 
-//dotenv
+// dotenv (open the .env file for more)
 require("dotenv").config();
 const DB=process.env.DB_URI;
 const PORT=process.env.SERVER_PORT || 3000;
+const KEY=process.env.SECRET_KEY || "another-secret-key"; // the key is supposed to be secret
 
-//jsonwebtoken
+// jsonwebtoken
 const jwt=require("jsonwebtoken");
-const KEY=process.env.SECRET_KEY || "another-secret-key";
 
 
-//connessione al database e avvio di express
+// connection to mongodb database e startup of express
 mongoose.connect(DB)
-.then(()=>{
+.then(/*async */()=>{
     console.log("Connected to mongoDB Cloud");
-    app.listen(PORT,()=>console.log("Server is running on port ",PORT));
+    app.listen(PORT,()=>console.log("Server is running on port",PORT));
+
+    // const admin=new Admin({email:"admin@bluecycle.com",password:"securepassword"});
+    // admin.save();
 })
 .catch((err)=>{
     console.log("Could not connect to mongoDB Cloud\n",err);
 });
 
 
-
-//autenticazione tramite credenziali e creazione dei token
+// credential authentication and token creation
 app.post("/api/v1/userAuth",async (req,res,next)=>{
-    try{    //take the parameter email as providedEmail
+    try{
         const {email:providedEmail,password:providedPassword}=req.body;
         if(!providedEmail||!providedPassword)
             res.locals.response={status:400,success:false,message:"Bad request",data:null};
@@ -59,16 +71,17 @@ app.post("/api/v1/userAuth",async (req,res,next)=>{
             if(!user)
                 res.locals.response={status:404,success:false,message:"Not found",data:null};
             else{
-                if(user.password!=providedPassword)
-                    res.locals.response={status:400,success:false,message:"Bad request",data:null};
-                else{
-                    const token=jwt.sign({id:user.id,role:"user"},KEY,{/*algorithm:"HS512",*/expiresIn:"1h"}); //->token con 1h di validità
+                //if(user.password!=providedPassword)
+                if(await bcrypt.compare(providedPassword,user.password)){
+                    const token=jwt.sign({id:user.id,role:"user"},KEY,{/*algorithm:"HS512",*/expiresIn:"1d"}); // -> token lifetime set to 1 hour (remember to change it back to 1h)
                     res.locals.response={status:200,success:true,message:"Authentication successfull",data:{self:"/api/v1/users/"+user._id,token:token}};
-                }
+                }else
+                    res.locals.response={status:400,success:false,message:"Bad request",data:null};
             }
         }
-    }catch(err){    //server error
-        console.log(err);
+    // server error
+    }catch(err){    
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -84,24 +97,24 @@ app.post("/api/v1/adminAuth",async (req,res,next)=>{
             if(!admin)
                 res.locals.response={status:404,success:false,message:"Not found",data:null}
             else{
-                if(admin.password!=providedPassword)
-                    res.locals.response={status:400,success:false,message:"Bad request",data:null};
-                else{
-                    const token=jwt.sign({id:admin.id,role:"admin"},KEY,{/*algorithm:"HS512",*/expiresIn:"1d"}); //->token con 1 giorno di validità
+                if(await bcrypt.compare(providedPassword,admin.password)){
+                    const token=jwt.sign({id:admin.id,role:"admin"},KEY,{/*algorithm:"HS512",*/expiresIn:"1d"}); // -> token lifetime set to 1 day
                     res.locals.response={status:200,success:true,message:"Authentication successfull",data:{self:"/api/v1/admins/"+admin._id,token:token}};
-                }
+                }else
+                    res.locals.response={status:400,success:false,message:"Bad request",data:null};
             }
         }
-    }catch(err){    //server error
-        console.log(err)
+    }catch(err){
+        console.error(err)
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
 });
 
-//middleware gestire in maniera centralizzata le risposte ottenibili in 
-//fase di controllo della richiesta (e per l'invio della risposta)
+// final middleware to centrally manage the response obtained from the previous middleware and send it to the client 
 app.use((req,res)=>{
-    const {status,success,message,data}=res.locals.response||{status:500,success:false,message:"Internal server error or method-endpoint not supported",data:null}; //da tenere nel caso non si siano coperti tutti i casi delle richieste
+    const {status,success,message,data}=res.locals.response||{status:500,success:false,message:"Internal server error or method-endpoint not supported",data:null}; // default response in case an unsupported endpoint is called
     res.status(status).json({success,message,data});
 });
+
+module.exports=KEY;

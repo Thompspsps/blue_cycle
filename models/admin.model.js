@@ -1,11 +1,19 @@
+// to do:
+// aggiungere validazione dell'email, con regex o validator
+// usare la libreria bcrypt per hashare la password
 const {Schema,model}=require("mongoose");
+const bcrypt=require("bcrypt");
+require("dotenv").config();
+
+const saltRounds=parseInt(process.env.SALT_ROUNDS)||10;
 
 const adminSchema=Schema(
     {
         email:{
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            trim: true
         },
         password:{
             type: String,
@@ -13,6 +21,11 @@ const adminSchema=Schema(
         }
     }
 );
+
+adminSchema.pre("save",async function(next){
+    await bcrypt.hash(this.password,saltRounds).then((haschedpassword)=>this.password=haschedpassword);
+    next();
+});
 
 const Admin=model("Admin",adminSchema);
 

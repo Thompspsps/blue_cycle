@@ -676,7 +676,7 @@ paths:
         - UserAuth: []
       tags:
         - user actions
-      summary: Retrieves a user's wishlist
+      summary: Retrieves a user's entire wishlist
       description: Fetches all coupons saved in the wishlist for the specified user
       responses:
         "200":
@@ -817,7 +817,8 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         "500":
           $ref: "#/components/responses/ServerError"
-    
+
+
   /users/{userId}/wishlistedCoupons/{itemId}:
     parameters:
     - in: path
@@ -830,6 +831,66 @@ paths:
       required: true
       schema:
         type: string
+    get:
+      security:
+      - UserAuth: []
+      tags:
+      - user actions
+      summary: Returns a user's wishlisted coupon
+      description: Fetches detailed information about a wishlisted item given its ids
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: "#/components/schemas/wishlistedCoupon"
+        "400":
+          description: The provided ID is not valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not valid id
+                  data:
+                    example: null
+        "404":
+          description: No registered user matches the provided ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
     delete:
       security:
       - UserAuth: []

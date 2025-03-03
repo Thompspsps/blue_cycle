@@ -19,10 +19,13 @@ const transactionSchema=Schema(
         },
         collected:{
             type: Number,
-            required:true
+            required:true,
+            minimum:0
         }
     }
 );
+
+
 
 const Transaction=model("Transaction",transactionSchema);
 

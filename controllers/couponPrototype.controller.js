@@ -23,7 +23,7 @@ const getCouponPrototypes=async (req,res,next)=>{
             res.locals.response={status:200,success:true,message:"OK",data:couponPrototypes};
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -47,7 +47,7 @@ const postCouponPrototype=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
@@ -69,7 +69,7 @@ const deleteCouponPrototypeById=async (req,res,next)=>{
             }
         }
     }catch(err){
-        console.log(err);
+        console.error(err);
         res.locals.response={status:500,success:false,message:"Internal server error",data:null};
     }
     next();
