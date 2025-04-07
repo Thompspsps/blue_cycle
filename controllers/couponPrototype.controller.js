@@ -29,6 +29,31 @@ const getCouponPrototypes=async (req,res,next)=>{
     next();
 };
 
+const getCouponProrotypeById=async(req,res,next)=>{
+    try{
+        const {id}=req.params;
+        if(!mongoose.Types.ObjectId.isValid(id))
+        res.locals.response={status:400,success:false,message:"Not valid id",data:null};
+        else{
+            let coupon=await CouponPrototype.findById(id).select("-__v");
+            if(!coupon)
+                res.locals.response={status:404,success:false,message:"Not found",data:null};
+            else{
+                if(await authenticateToken(req,res,["user","admin"])){
+                    coupon=coupon.toObject();
+                    coupon.self="/api/v1/couponPrototypes/"+coupon._id;
+                    delete coupon._id;
+                    res.locals.response={status:200,success:true,message:"OK",data:coupon};
+                }
+            }
+        }
+    }catch(err){
+        console.error(err);
+        res.locals.response={status:500,success:false,message:"Internal server error",data:null};
+    }
+    next();
+}
+
 //magari aggiungere una getCouponProrotypeById
 
 const postCouponPrototype=async (req,res,next)=>{
@@ -43,6 +68,7 @@ const postCouponPrototype=async (req,res,next)=>{
                 createdCouponPrototype=createdCouponPrototype.toObject();
                 createdCouponPrototype.self="/api/v1/couponPrototypes/"+createdCouponPrototype._id;
                 delete createdCouponPrototype._id;
+                delete createdCouponPrototype.__v;
                 res.locals.response={status:201,success:true,message:"Created",data:createdCouponPrototype};
             }
         }
@@ -65,7 +91,7 @@ const deleteCouponPrototypeById=async (req,res,next)=>{
                     res.locals.response={status:404,success:false,message:"Not Found",data:null};
                 // non mostra contenuto json stranamente
                 else
-                    res.locals.response={status:204,success:true,message:"Deleted",data:null};
+                    res.locals.response={status:200,success:true,message:"Deleted",data:null};
             }
         }
     }catch(err){
@@ -77,6 +103,7 @@ const deleteCouponPrototypeById=async (req,res,next)=>{
 
 module.exports={
     getCouponPrototypes,
+    getCouponProrotypeById,
     postCouponPrototype,
     deleteCouponPrototypeById
 };

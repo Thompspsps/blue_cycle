@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Riservata</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a  href="/Home/home.html" class="home-arrow">Home ☞</a>
+        
+    </header>
+    <main class="centered-window">
+        <h1>Area Riservata</h1>
+        <div class="user-details">
+            <div class="detail-item"><strong>Nome:</strong> <span id="user-name"></span></div>
+            <div class="detail-item"><strong>Cognome:</strong> <span id="user-surname"></span></div>
+            <div class="detail-item"><strong>ID:</strong> <span id="user-id"></span></div>
+            <div class="detail-item"><strong>Email:</strong> <span id="user-email"></span></div>
+            <div class="detail-item"><strong>Punteggio:</strong> <span class="user-score"></span></div>
+            <p><strong>Codice:</strong> <span id="qr-code"></span></p>
+            <div class="detail-item">
+                <button id="show-code">Mostra QR Code</button>
+                <div id="qrcode" class="qrcode-center"></div>
+                
+            </div>
+            <button id="logout" class="logout-button">Logout</button>
+        </div>
+    </main>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="qrcode" class="qrcode-center"></div>
+            
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

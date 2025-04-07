@@ -1,20 +1,18 @@
 // to do: 
 // prevedere due messaggi diversi per assenza di autorizzazione e token scaduto(basta decommentare)
-// aggiungere una funzione che firmi un token e importarlo su index
+// importare la KEY da index (riga 8)
 
 const jwt=require("jsonwebtoken");
-require("dotenv");
-const KEY=process.env.SECRET_KEY || "another-secret-key";
+require("dotenv").config();
+const KEY=process.env.SECRET_KEY||"another-secret-key";
 //const {KEY}=require("../index"); // ensure the same key is used
 
 const authenticateToken=async (req,res,roles,id=null)=>{
-    // console.log("key:",KEY);
     const authHeader=req.headers["authorization"];
     const token=authHeader && authHeader.split(" ")[1]; // Syntax: Bearer <token>
     
     // token not included on the request headers
     if(!token){
-        // console.log("niente token")
         res.locals.response={status:401,success:false,message:"Unauthorized",data:null};
         return false;
     }

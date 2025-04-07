@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticazione JWT con HS512</title>
+    <link rel="stylesheet" href="style.css"> <!-- Riferimento al file CSS -->
+   
+</head>
+<body>
+    <div class="container">
+        <h1>Bentornato in BlueCycle</h1>
+        <div class="input-field">
+            <label for="email">Mail</label>
+            <input type="email" id="email" placeholder="Enter your Mail">
+        </div>
+        <div class="input-field">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <div id="recaptcha-container"></div>
+        <button id="loginButton">Login</button>
+        <pre id="output"></pre>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="script.js"></script> <!-- Collegamento al file JavaScript esterno -->
+</body>
+</html>

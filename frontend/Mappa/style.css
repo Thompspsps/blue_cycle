@@ -1,0 +1,36 @@
+body
+{
+  background: linear-gradient(to right, #64dbfc, #539cf5);
+}
+
+#map { 
+    height: 80vh; 
+  }
+  
+  #controls { 
+    padding: 10px; 
+  }
+  
+  button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+  }
+  
+  select, input {
+    padding: 5px;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
+  label {
+    display: block;
+    margin-top: 5px;
+  }
+  
+  
+header .home-arrow {
+  text-decoration: none;
+  font-size: 20px;
+  color: white; /* Colore della freccia */
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Punti di Interesse e Percorso da Povo</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+</head>
+<body>
+  <header>
+    <a href="/Home/home.html" class="home-arrow">Home ☞</a>
+  </header>
+  <div id="map"></div>
+  <div id="controls">
+    <button onclick="resetMap()">Reset</button>
+    <select id="startSelect" onchange="handleStartSelectChange()">
+      <option value="povo">Povo (predefinito)</option>
+      <option value="geolocation">Geolocalizzazione</option>
+      <option value="manual">Inserimento manuale</option>
+    </select>
+    <div id="manualCoords" style="display:none;">
+      <label>Latitudine: <input type="text" id="manualLat" /></label>
+      <label>Longitudine: <input type="text" id="manualLng" /></label>
+    </div>
+    <select id="poiSelect">
+      <option value="">Seleziona un punto di interesse</option>
+    </select>
+    <select id="transportSelect">
+      <option value="driving-car">Auto</option>
+      <option value="cycling-regular">Bicicletta</option>
+      <option value="foot-walking">A piedi</option>
+    </select>
+    <button onclick="generateRoute()">Genera Percorso</button>
+    <button onclick="openFilterModal()">Filtra</button>
+  </div>
+
+  <!-- Modal -->
+  <div id="filterModal" style="display:none;">
+    <div>
+      <h2>Filtra Ecocompattatori</h2>
+      <label>Range (km): <input type="number" id="rangeInput" /></label>
+      <label>Disponibilità: 
+        <select id="availabilitySelect">
+          <option value="any">Qualsiasi</option>
+          <option value="true">Solo disponibili</option>
+          <option value="false">Solo non disponibili</option>
+        </select>
+      </label>
+      <button onclick="applyFilter()">Filtra</button>
+      <button onclick="closeFilterModal()">Chiudi</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,3 +1,6 @@
+// to do
+// togliere campi superflui(__v)
+
 const {Machine,Transaction}=require("../models/bc.models");
 const {authenticateToken}=require("../scripts/tokenChecker");
 const {fetchPoints}=require("../scripts/pointsFetcher");
@@ -29,10 +32,9 @@ const getMachines=async (req,res,next)=>{
                 }
             }
             console.log(filters);
-            let machines=await Machine.find(filters);
+            let machines=await Machine.find(filters).select("-position._id");
             machines=machines.map((entry)=>{
                 entry=entry.toObject();
-                delete entry.position._id;
                 return {
                     self:"/api/v1/machines/"+entry._id,
                     position:entry.position,
@@ -57,14 +59,13 @@ const getMachineById=async (req,res,next)=>{
             if(!mongoose.Types.ObjectId.isValid(id))
                 res.locals.response={status:400,success:false,message:"Not valid id",data:null};
             else{
-                let machine=await Machine.findById(id);
+                let machine=await Machine.findById(id).select("-__v -position._id");
                 if(!machine)
                     res.locals.response={status:404,success:false,message:"Not found",data:null};
                 else{
                     machine=machine.toObject();
                     machine.self="/api/v1/machines/"+machine._id;
                     delete machine._id;
-                    delete machine.position._id;
                     res.locals.response={status:200,success:true,message:"OK",data:machine};
                 }
             }
@@ -80,12 +81,6 @@ const postMachine=async (req,res,next)=>{
     try{
         if(await authenticateToken(req,res,["admin"])){
             const {position:providedPosition,available:providedAvailable,description:providedDescription}=req.body;
-            // console.log(req.body);
-            // console.log(providedPosition);
-            // console.log(providedPosition.latitude);
-            // console.log(providedPosition.longitude)
-            // console.log(providedAvailable);
-            // console.log(providedDescription);
             if((!providedPosition||!providedAvailable)||(!providedPosition.latitude||!providedPosition.longitude))
                 res.locals.response={status:400,success:false,message:"Bad request",data:null};
             else{
@@ -94,6 +89,7 @@ const postMachine=async (req,res,next)=>{
                 createdMachine=createdMachine.toObject();
                 createdMachine.self="/api/v1/machines/"+createdMachine._id;
                 delete createdMachine._id;
+                delete createdMachine.__v;
                 delete createdMachine.position._id;
                 res.locals.response={status:201,success:true,message:"Created",data:createdMachine};
             }
@@ -118,12 +114,11 @@ const patchMachineById=async (req,res,next)=>{
                 else{
                     const {available:providedAvailable}=req.body;
                     if(typeof(providedAvailable)==="boolean"){
-                        let modifiedMachine=await Machine.findByIdAndUpdate(id,{available:providedAvailable});
+                        let modifiedMachine=await Machine.findByIdAndUpdate(id,{available:providedAvailable}).select("-__v -position._id");
                         modifiedMachine=modifiedMachine.toObject();
                         modifiedMachine.self="/api/v1/machines/"+modifiedMachine._id;
                         modifiedMachine.available=providedAvailable;
                         delete modifiedMachine._id;
-                        delete modifiedMachine.position._id;
                         res.locals.response={status:200,success:true,message:"Updated successfully",data:modifiedMachine};
                     }else
                         res.locals.response={status:400,success:false,message:"Bad request",data:null};
@@ -148,7 +143,7 @@ const getMachineByIdTransactions=async (req,res,next)=>{
                 res.locals.response={status:404,success:false,message:"Not found",data:null};
             else{
                 if(await authenticateToken(req,res,["admin"])){
-                    let transactions=await Transaction.find({user:id});
+                    let transactions=await Transaction.find({machine:id});
                     transactions=transactions.map((entry)=>{
                         return{
                             self:"/api/v1/transactions/"+entry._id,

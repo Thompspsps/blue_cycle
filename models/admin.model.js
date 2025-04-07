@@ -1,6 +1,6 @@
 // to do:
 // aggiungere validazione dell'email, con regex o validator
-// usare la libreria bcrypt per hashare la password
+
 const {Schema,model}=require("mongoose");
 const bcrypt=require("bcrypt");
 require("dotenv").config();

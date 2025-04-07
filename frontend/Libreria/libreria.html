@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Coupon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a style="color: white; font-size: 20px;" href="/Home/home.html" class="home-arrow">Home ☞</a>
+        <h1>Libreria Coupon</h1>
+        <input type="text" id="search" placeholder="Cerca coupon...">
+        <button id="toggle-view">Vedi Coupon Scaduti o Usati</button>
+    </header>
+    <main>
+        <div id="coupon-container"></div>
+    </main>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="coupon-details"></div>
+            <svg id="barcode"></svg> <!-- Usa un tag SVG per JsBarcode -->
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

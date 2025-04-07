@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Layout</title>
+    <link media="all" rel="stylesheet" href="./build.css">
+    <script src="./modernizr.js.download"></script>
+    <script src="./jquery.min.js.download"></script>
+</head>
+
+<body class="t-Pac enhanced" marginwidth="0" marginheight="0">
+    <h3 class="u-text-h3">Versione POST</h3>
+    <div class="Grid">
+        <div class="Grid-cell u-md-size1of2 u-lg-size1of4">
+            <div class="Spid">
+                <form name="spid_idp_access" action="https://italia.github.io/design-web-toolkit/components/preview/spid.html#"
+                    method="post" class="Spid u-margin-bottom-xxl">
+                    <input type="hidden" name="param_001" value="">
+                    <input type="hidden" name="param_002" value="">
+                    <input type="hidden" name="param_003" value="">
+                    <a href="https://italia.github.io/design-web-toolkit/components/preview/spid.html#spid-button-post-xxs"
+                        data-menu-trigger="spid-button-post-xxs" class="Button Spid-button u-text-r-xxs"
+                        aria-controls="spid-button-post-xxs" aria-haspopup="true" role="button">
+                        <img src="./spid-ico-circle-bb.svg" alt="">
+                        <span style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Entra con SPID</span>
+                    </a>
+                    <div id="spid-button-post-xxs" data-menu="" class="Spid-menu Dropdown-menu" x-placement="bottom"
+                        role="menu" aria-hidden="true" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-1px, 38px, 0px);">
+                        <ul class="Linklist js-randomize">
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con TIM ID</span>
+                                    <img src="./spid-idp-timid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con Sielte ID</span>
+                                    <img src="./spid-idp-sielteid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con Poste ID</span>
+                                    <img src="./spid-idp-posteid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con Namirial ID</span>
+                                    <img src="./spid-idp-namirialid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con SPIDItalia Register.it</span>
+                                    <img src="./spid-idp-spiditalia.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con Infocert ID</span>
+                                    <img src="./spid-idp-infocertid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                            <li role="menuitem">
+                                <button class="Spid-idp" tabindex="0">
+                                    <span class="u-hiddenVisually">Prosegui con Aruba ID</span>
+                                    <img src="./spid-idp-arubaid.svg" alt="" class="u-text-r-xxs">
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <ul class="Prose u-margin-top-l u-margin-bottom-xxl">
+                <li>
+                    <a href="http://www.spid.gov.it/" class="u-color-50">Informazioni su SPID</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--[if IE 8]>
+    <script src="../../build/vendor/respond.min.js"></script>
+    <script src="../../build/vendor/rem.min.js"></script>
+    <script src="../../build/vendor/selectivizr.js"></script>
+    <script src="../../build/vendor/slice.js"></script>
+    <![endif]-->
+
+    <!--[if lte IE 9]>
+    <script src="../../build/vendor/polyfill.min.js"></script>
+    <![endif]-->
+
+    <!-- sostituire questo percorso con quello degli assets javascript nel proprio sito web:
+    è il percorso, relativo alla webroot, della directory che contiene il file IWT.min.js e i file *.chunk.js -->
+    <script>__PUBLIC_PATH__ = '../../build/'</script>
+    <script src="./IWT.min.js.download"></script>
+</body>
+
+</html>

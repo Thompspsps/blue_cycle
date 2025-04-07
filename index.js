@@ -1,8 +1,11 @@
 // to do:
-// utilizzare il package bcrypt per gestire con piu' sicurezza le password
-// aggiungere un middleware separeto per la verifica del token jwt
 // cambiare la durata del token per l'utente
 // magari gestire il logging con winston (al posto di console.log)
+// aggiungere a swagger la descrizione di reset_password
+// aggiungere nel frontend il controllo di validità dell'email, con validator
+// bug per cui l'utente restituito da resetUserPasswordByEmail ha la password in chiaro
+
+// controllare bug con il reset_password viene restituito temporary:true(il campo effettivo viene aggiornato correttamente)
 
 // package for date (doesn't really have a meaningfull use beside debugging(?))
 const moment=require("moment");
@@ -45,15 +48,14 @@ const KEY=process.env.SECRET_KEY || "another-secret-key"; // the key is supposed
 // jsonwebtoken
 const jwt=require("jsonwebtoken");
 
+const {transporter,senderAddress}=require("./scripts/emailSender");
+
 
 // connection to mongodb database e startup of express
 mongoose.connect(DB)
-.then(/*async */()=>{
+.then(async ()=>{
     console.log("Connected to mongoDB Cloud");
-    app.listen(PORT,()=>console.log("Server is running on port",PORT));
-
-    // const admin=new Admin({email:"admin@bluecycle.com",password:"securepassword"});
-    // admin.save();
+    app.listen(PORT,"0.0.0.0",()=>console.log("Server is running on port",PORT));
 })
 .catch((err)=>{
     console.log("Could not connect to mongoDB Cloud\n",err);
@@ -71,8 +73,7 @@ app.post("/api/v1/userAuth",async (req,res,next)=>{
             if(!user)
                 res.locals.response={status:404,success:false,message:"Not found",data:null};
             else{
-                //if(user.password!=providedPassword)
-                if(await bcrypt.compare(providedPassword,user.password)){
+                if(await bcrypt.compare(providedPassword,user.password.content)){
                     const token=jwt.sign({id:user.id,role:"user"},KEY,{/*algorithm:"HS512",*/expiresIn:"1d"}); // -> token lifetime set to 1 hour (remember to change it back to 1h)
                     res.locals.response={status:200,success:true,message:"Authentication successfull",data:{self:"/api/v1/users/"+user._id,token:token}};
                 }else
@@ -110,6 +111,36 @@ app.post("/api/v1/adminAuth",async (req,res,next)=>{
     }
     next();
 });
+
+// da riguardare
+const resetUserPasswordByEmail=async (req,res,next)=>{
+    try{
+        const {email:providedEmail}=req.body;
+        let tpassword=Math.random().toString(36).slice(-8);
+        let user=await User.findOneAndUpdate({email:providedEmail},{password:{content:tpassword,temporary:true}}).select("-__v -password._id");
+        if(user){
+            user=user.toObject();
+            user.self="/api/v1/users/"+user._id;
+            delete user._id;
+            res.locals.response={status:200,success:true,message:"OK",data:user};
+            await transporter.sendMail({
+                from: senderAddress, // sender address
+                to: user.email, // list of receivers
+                subject: "Cambio password", // Subject line
+                text: "La tua nuova password temporanea è: "+tpassword,
+            })
+            .then(()=>console.log("Email sent"));
+            console.log("------->",tpassword);
+        }else
+            res.locals.response={status:404,success:false,message:"User not found",data:null};
+    }catch(err){
+        console.error(err);
+        res.locals.response={status:500,success:false,message:"Internal server error",data:null};
+    }
+    next();
+};
+
+app.post("/api/v1/forgotPassword",resetUserPasswordByEmail);
 
 // final middleware to centrally manage the response obtained from the previous middleware and send it to the client 
 app.use((req,res)=>{

@@ -1,15 +1,15 @@
 # DO NOT change urls or headers, only headers value and body parameters' values
 
 # Admin
-@atkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYyZjA4OTQ5OTc5YTlmNzc0ZmQ0MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MDU4NzQ1MywiZXhwIjoxNzQwNjczODUzfQ.zplHGi6XdNo_bECVKOo3tCisM1bac1UZn_djzRtTJMc
+@atkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYyZjA4OTQ5OTc5YTlmNzc0ZmQ0MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzY3OTA4NiwiZXhwIjoxNzQzNzY1NDg2fQ.k2TI_jfPkq9it-MvmeUDYiW38_maqvZqgSTApfQ2nQA
 
 # User1
-@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYzNWVhMjZhOGYyOWMyYmY0MjAwYiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwNTg3NDc2LCJleHAiOjE3NDA2NzM4NzZ9.-h68dM3jbbupo5ENfJt6p6ouXARiy_eMh0u-B13w_XE
-@u1id=67bf35ea26a8f29c2bf4200b
+@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlM2NlODAwNzBlMjdjYzk2NjM5MSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjc5MTI1LCJleHAiOjE3NDM3NjU1MjV9.SXmJbBcVFSiqDXi2SuQT_66tLrWwtpV0Sp_977OsffU
+@u1id=67dee3ce80070e27cc966391
 
 # User2
-@u2tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYzNjE3MjZhOGYyOWMyYmY0MjAxMCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQwNTg3NTE5LCJleHAiOjE3NDA2NzM5MTl9.B4JlhjO9-B--FlRtTfU9nQi2NPRAG4-NeVLBactlJxA
-@u2id=67bf361726a8f29c2bf42010
+@u2tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlMzRhODAwNzBlMjdjYzk2NjM4YyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjc5MTA0LCJleHAiOjE3NDM3NjU1MDR9.0j_vCPEdYmC4t0JH32cEv3EPIiUJvFuvdpoGcOL9Pxo
+@u2id=67dee34a80070e27cc96638c
 
 # Machine (token staticly generated)
 @mtkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NGRjNjliZjkzZmIxOTE0ODI4NTRiOSIsInJvbGUiOiJtYWNoaW5lIn0.ao5jQmK0cTLAcYcVcTdVl_cxT3KBRQStFq49dDxuoQs
@@ -18,7 +18,7 @@
 ###
 
 # Authentication
-# it's necessary to call this endpoints in order to obtain the required token for protected endpoints
+# it's necessary to call this endpoints in order to obtain the required token for accessing protected endpoints
 # Admin
 POST http://localhost:3000/api/v1/adminAuth
 content-type: application/json
@@ -34,7 +34,7 @@ content-type: application/json
 
 {
     "email":"mariorossi@example.com",
-    "password":"i18osr5dob"
+    "password":"noooitsbahamuth"
 }
 ###
 # User2
@@ -43,7 +43,17 @@ content-type: application/json
 
 {
     "email":"toniobianchi@example.com",
-    "password":"w7t8twtge6"
+    "password":"itsbahamut"
+}
+
+###
+
+# Password reset
+POST http://localhost:3000/api/v1/forgotPassword
+content-type: application/json
+
+{
+    "email":"mariorossi@example.com"
 }
 
 ###
@@ -53,8 +63,8 @@ POST http://localhost:3000/api/v1/users
 content-type: application/json
 
 {
-    "email":"toniobianchi@example.com",
-    "name":"Tonio Bianchi"
+    "email":"mariorossi@example.com",
+    "name":"Mario Rossi"
 }
 
 ###
@@ -66,7 +76,7 @@ GET http://localhost:3000/api/v1/users
 Authorization: Bearer {{atkn}}
 ###
 # Machine
-GET http://localhost:3000/api/v1/users?code=8122879956
+GET http://localhost:3000/api/v1/users?code=6788810009
 Authorization: Bearer {{mtkn}}
 
 ###
@@ -88,13 +98,13 @@ Authorization: Bearer {{u2tkn}}
 
 # Patch user password
 # Admin
-PATCH http://localhost:3000/api/v1/users/{{u2id}}
+PATCH http://localhost:3000/api/v1/users/{{u1id}}
 content-type: application/json
-Authorization: Bearer {{atkn}}
+Authorization: Bearer {{u1tkn}}
 
 {
-    "oldPassword":"itsbahamut",
-    "newPassword":"itsbahamut"
+    "oldPassword":"nooitsbahamuth",
+    "newPassword":"noooitsbahamuth"
 }
 ###
 # User1
@@ -103,8 +113,8 @@ content-type: application/json
 Authorization: Bearer {{u1tkn}}
 
 {
-    "oldPassword":"rlk2yk652s",
-    "newPassword":"Piadaqwerty"
+    "oldPassword":"noooitsbahamuth",
+    "newPassword":"nnaak5hm"
 }
 ###
 # User2
@@ -141,7 +151,7 @@ content-type: application/json
 Authorization: Bearer {{u1tkn}}
 
 {
-    "couponPrototype":"/api/v1/couponPrototypes/67bf6cc77bb68f5200f9d1e1"
+    "couponPrototype":"/api/v1/couponPrototypes/67bf6cf07bb68f5200f9d1e5"
 }
 ###
 # User2
@@ -154,6 +164,8 @@ Authorization: Bearer {{u2tkn}}
 }
 
 ###
+
+# FUNZIONA
 
 # Post new wishlisted coupon(prototypes)
 # User1
@@ -176,7 +188,9 @@ Authorization: Bearer {{u2tkn}}
 
 ###
 
-# Get wishlisted coupon(prototypes)
+# FUNZIONA
+
+# Get user's wishlisted coupon prototypes
 # User1
 GET http://localhost:3000/api/v1/users/{{u1id}}/wishlistedCoupons
 Authorization: Bearer {{u1tkn}}
@@ -187,9 +201,11 @@ Authorization: Bearer {{u2tkn}}
 
 ###
 
+# FUNZIONA
+
 # Get user's wishlisted coupon by id
 # User 1
-GET http://localhost:3000/api/v1/users/{{u1id}}/wishlistedCoupons/67bf72257bb68f5200f9d239
+GET http://localhost:3000/api/v1/users/{{u1id}}/wishlistedCoupons/67e14bb9bfb608deeb9bc61c
 Authorization: Bearer {{u1tkn}}
 ###
 # User 2
@@ -198,16 +214,70 @@ Authorization: Bearer {{u2tkn}}
 
 ###
 
+# FUNZIONA
+
 # Delete wishlisted coupon by id
 # User1
-DELETE http://localhost:3000/api/v1/users/{{u1id}}/wishlistedCoupons/67bf71447bb68f5200f9d22a
+DELETE http://localhost:3000/api/v1/users/{{u1id}}/wishlistedCoupons/67e14bb9bfb608deeb9bc61c
 Authorization: Bearer {{u1tkn}}
 ###
 # User2
-DELETE http://localhost:3000/api/v1/users/{{u2id}}/wishlistedCoupons/:id
+DELETE http://localhost:3000/api/v1/users/{{u2id}}/wishlistedCoupons/675956b45e757f064f60db62
 Authorization: Bearer {{u2tkn}}
 
 # ------------------------------------------------------------------------------------------------
+
+###
+
+# Get coupon prototypes
+# Admin
+GET http://localhost:3000/api/v1/couponPrototypes
+Authorization: Bearer {{atkn}}
+###
+# User1
+GET http://localhost:3000/api/v1/couponPrototypes
+Authorization: Bearer {{u1tkn}}
+###
+# User2
+GET http://localhost:3000/api/v1/couponPrototypes
+Authorization: Bearer {{u2tkn}}
+
+###
+
+# Get coupon prototype by id
+# Admin
+GET http://localhost:3000/api/v1/couponPrototypes/67bf6cc77bb68f5200f9d1e1
+Authorization: Bearer {{atkn}}
+###
+# User1
+GET http://localhost:3000/api/v1/couponPrototypes/67bf6cdc7bb68f5200f9d1e3
+Authorization: Bearer {{u1tkn}}
+###
+# User2
+GET http://localhost:3000/api/v1/couponPrototypes/67bf6cf07bb68f5200f9d1e5
+Authorization: Bearer {{u2tkn}}
+
+###
+
+# Post new coupon prototype
+# Admin
+POST http://localhost:3000/api/v1/couponPrototypes
+Authorization: Bearer {{atkn}}
+content-type: application/json
+
+{
+    "store": "Ottica Trento",
+    "discount": 20,
+    "price": 25,
+    "description": "Sconto del 20% su montature per occhiali"
+}
+
+###
+
+# Delete coupon prototype
+# Admin
+DELETE http://localhost:3000/api/v1/couponPrototypes/67bf6dcc7bb68f5200f9d1fb
+Authorization: Bearer {{atkn}}
 
 ###
 
@@ -246,11 +316,11 @@ Authorization: Bearer {{u2tkn}}
 # < filters: available,proximity >
 # Admin
 # CAMBIARE COORDINATE(METTERE QUELLE DI POVO???)
-GET http://localhost:3000/api/v1/machines?proximity[range]=3.2&proximity[from][latitude]=46.0387255&proximity[from][longitude]=11.147175500000001
+GET http://localhost:3000/api/v1/machines?proximity[range]=1&proximity[from][latitude]=46.0387255&proximity[from][longitude]=11.147175500000001
 Authorization: Bearer {{atkn}}
 ###
 # User1
-GET http://localhost:3000/api/v1/machines?available=false
+GET http://localhost:3000/api/v1/machines?
 Authorization: Bearer {{u1tkn}}
 ###
 # User2
@@ -265,11 +335,11 @@ GET http://localhost:3000/api/v1/machines/674dc41cf93fb191482854ad
 Authorization: Bearer {{atkn}}
 ###
 # User1
-GET http://localhost:3000/api/v1/machines
+GET http://localhost:3000/api/v1/machines/674dc660f93fb191482854b6
 Authorization: Bearer {{u1tkn}}
 ###
 # User2
-GET http://localhost:3000/api/v1/machines
+GET http://localhost:3000/api/v1/machines/{{mid}}
 Authorization: Bearer {{u2tkn}}
 
 ###
@@ -285,7 +355,7 @@ content-type: application/json
         "latitude":46.036299,
         "longitude":11.146156
     },
-    "description":"5th_machine",
+    "description":"6th_machine",
     "available":true
 }
 
@@ -298,7 +368,7 @@ Authorization: Bearer {{atkn}}
 content-type: application/json
 
 {
-    "available":false
+    "available":true
 }
 
 ###
@@ -310,61 +380,9 @@ Authorization: Bearer {{atkn}}
 
 ###
 
-# Get machine by id
-# Admin
-GET http://localhost:3000/api/v1/machines/{{mid}}
-Authorization: Bearer {{atkn}}
-###
-# User1
-GET http://localhost:3000/api/v1/machines/{{mid}}
-Authorization: Bearer {{u1tkn}}
-###
-# User2
-GET http://localhost:3000/api/v1/machines/{{mid}}
-Authorization: Bearer {{u2tkn}}
-
-###
-
 # Get machine transactions collected
 # Admin
 GET http://localhost:3000/api/v1/machines/{{mid}}/transactions/collected
-Authorization: Bearer {{atkn}}
-
-###
-
-# Get coupon prototypes
-# Admin
-GET http://localhost:3000/api/v1/couponPrototypes
-Authorization: Bearer {{atkn}}
-###
-# User1
-GET http://localhost:3000/api/v1/couponPrototypes
-Authorization: Bearer {{u1tkn}}
-###
-# User2
-GET http://localhost:3000/api/v1/couponPrototypes
-Authorization: Bearer {{u2tkn}}
-
-###
-
-# Post new coupon prototype
-# Admin
-POST http://localhost:3000/api/v1/couponPrototypes
-Authorization: Bearer {{atkn}}
-content-type: application/json
-
-{
-    "store": "Ottica Trento",
-    "discount": 20,
-    "price": 25,
-    "description": "Sconto del 20% su montature per occhiali"
-}
-
-###
-
-# Delete coupon prototype
-# Admin
-DELETE http://localhost:3000/api/v1/couponPrototypes/67bf6dcc7bb68f5200f9d1fb
 Authorization: Bearer {{atkn}}
 
 ###
@@ -378,7 +396,7 @@ content-type: application/json
 {
     "user":"/api/v1/users/{{u1id}}",
     "machine":"/api/v1/machines/{{mid}}",
-    "collected":10
+    "collected":1000
 }
 
 ###

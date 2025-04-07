@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <a  href="/Home/home.html" class="home-arrow">Home ☞</a>
+        <h1 id="title">Impostazioni</h1>
+    </header>
+    <main class="settings-container">
+        <section class="settings-section">
+            <h2 id="language-title">Cambia Lingua</h2>
+            <label for="language" id="language-label"><strong>Lingua:</strong></label>
+            <div class="language-selector" id="language-selector">
+                <select id="language">
+                    <option value="it">Italiano</option>
+                    <option value="en">English</option>
+                    <option value="de">Deutsch</option>
+                    <option value="zh">中文 (Cinese)</option>
+                    <option value="ar">العربية (Arabo)</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="settings-section">
+            <h2 id="manage-notifications">Gestisci Notifiche</h2>
+            <form id="notifications-form">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="email-notifications">
+                        <span id="email-notifications-label">Notifiche Email</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="sms-notifications">
+                        <span id="sms-notifications-label">Notifiche SMS</span>
+                    </label>
+                </div>
+                <button type="submit" id="save-settings-button">Salva le Impostazioni</button>
+            </form>
+        </section>
+
+        <section class="settings-section">
+            <h2 id="change-password-title">Cambia la Password</h2>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="current-password" id="current-password-label">Password Attuale:</label>
+                    <input type="password" id="current-password" name="current-password">
+                </div>
+                <div class="form-group">
+                    <label for="new-password" id="new-password-label">Nuova Password</label>
+                    <input type="password" id="new-password" name="new-password">
+                </div>
+                <button type="submit" id="change-password-button">Cambia la Password</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

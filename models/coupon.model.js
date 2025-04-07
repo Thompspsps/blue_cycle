@@ -1,6 +1,18 @@
+// to do
+// rimuovere dalle dipendenze uuid e voucher-code-generator
+
 const {Schema,model}=require("mongoose");
 // const {v4:uuidv4}=require('uuid'); da tohgliere
-const voucher_codes=require("voucher-code-generator");
+// const voucher_codes=require("voucher-code-generator");
+// const {nanoid}=require("nanoid");
+let customAlphabet;
+(async()=>{
+    const nanoidModule=await import("nanoid");
+    customAlphabet=nanoidModule.customAlphabet;
+})();
+
+const alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const fixedLength=10; // all codes have fixed length
 
 const set31DaysFromNow=()=>{
     const today=Math.trunc(Date.now()/1000);
@@ -17,7 +29,8 @@ const couponSchema=Schema(
         },
         code:{
             type: String,
-            unique:true
+            unique:true,
+            default:()=>customAlphabet(alphabet,fixedLength)()
         },
         store:{
             type: String,
@@ -45,8 +58,8 @@ const couponSchema=Schema(
 
 // middleware for generating a code before saving
 couponSchema.pre("save",async function(next){
-    if(!this.code)
-        this.code=voucher_codes.generate({length:10,count:1,charset:"alphanumeric"})[0];
+    // if(!this.code)
+    //     this.code=voucher_codes.generate({length:10,count:1,charset:"alphanumeric"})[0];
     this.expiration=set31DaysFromNow();
     next();
 });

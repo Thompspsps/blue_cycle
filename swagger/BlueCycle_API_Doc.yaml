@@ -221,6 +221,55 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+  /forgotPassword:
+    post:
+      tags:
+      - user actions
+      summary: Reset a user's password
+      description: Change a user's password with a temporary one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    $ref: "#/components/schemas/user"
+        "404":
+          description: No registered user matches the provided email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: User not found
+                  data:
+                    example: null
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /users:
     get:
       security:
@@ -229,7 +278,7 @@ paths:
       tags:
         - admin actions
         - machine actions
-      summary: Retrieve a List of all users
+      summary: Retrieve a list of all users
       description: Fetches a comprehensive list of users registered within the system. Optional query parameters can be used to filter the results
       parameters:
         - in: query
@@ -899,7 +948,7 @@ paths:
       summary: Deletes a wishlisted item
       description: Removes a coupon from the user's wishlist
       responses:
-        "204":
+        "200":
           description: Wishlisted item deleted
           content:
             application/json:
@@ -1557,6 +1606,69 @@ paths:
       schema:
         type: string
       required: true
+    get:
+      security:
+      - AdminAuth: []
+      - UserAuth: []
+      tags:
+      - admin actions
+      - user actions
+      summary: Returns an existing coupon
+      description: Fetch and returns a coupon by id
+      responses:
+        "200":
+          description: Item found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: OK
+                  data:
+                    example: null
+
+        "400":
+          description: Not valid id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Not valid id
+                  data:
+                    example: null
+        "404":
+          description: Coupon not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message: 
+                    type: string
+                    example: Not found
+                  data:
+                    example: null
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
     delete:
       security:
       - AdminAuth: []
@@ -1565,7 +1677,7 @@ paths:
       summary: Deletes an existing coupon
       description: Removes a coupon from the rewards store
       responses:
-        "204":
+        "200":
           description: Deleted
           content:
             application/json:
@@ -1710,8 +1822,16 @@ components:
           description: The full name of the user
           example: Mario Rossi
         password:
-          type: string
-          description: The user's password
+          type: object
+          required:
+          - content
+          properties:
+            temporary:
+              type: boolean
+              description: flag that indicates whether or not the password is temporary
+            content:
+              type: string
+              description: user's hashed password
         points:
           type: integer
           description: The user's points balance
@@ -1786,7 +1906,7 @@ components:
           description: Link to the coupon(prototype)
 
     couponPrototype:
-      description: This is a item available on the store. It represents a coupon pattern
+      description: This is a item available on the store. It represents a coupon pattern used only for visualization purposes
       type: object
       required:
       - self
