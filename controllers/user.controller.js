@@ -10,6 +10,7 @@ const bcrypt=require("bcrypt");
 require("dotenv").config();
 
 const {transporter,senderAddress}=require("../scripts/emailSender");
+const moment = require("moment");
 const saltRounds=parseInt(process.env.SALT_ROUNDS)||10;
 
 
@@ -226,6 +227,14 @@ const postUserByIdCoupon=async (req,res,next)=>{
                             delete coupon._id;
                             delete coupon.__v;
                             res.locals.response={status:201,success:true,message:"Added",data:coupon};
+                            await transporter.sendMail({
+                                from: senderAddress, // sender address
+                                to: providedEmail, // list of receivers
+                                subject: "Ecco il tuo premio", // Subject line
+                                text: "Codice coupon: "+coupon.code+"\nNegozio affiliato: "+coupon.store+"\nSconto: "+coupon.discount+"\nDescrizione: "+coupon.description+"\nDa usare prima del "+moment(coupon.expiration).format("DD-MM-YYYY")
+                            })
+                            .then(()=>console.log("New coupon created. Email sent"))
+                            .catch(()=>console.log("Something went wrong"));
                         }catch(err){
                             console.error(err);
                             res.locals.response={status:422,success:false,message:"Unprocessable Entity",data:null};
