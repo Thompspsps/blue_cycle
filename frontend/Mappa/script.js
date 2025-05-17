@@ -10,7 +10,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Coordinates of Povo (default location)
 var povo = L.latLng(46.067014, 11.155030);
 var startPoint = povo;
-var povoMarker = L.marker(povo).addTo(map).bindPopup('Povo'); // Marker for Povo
+
+// Marker for Povo with a custom color
+var povoMarker = L.circleMarker(povo, {
+    color: 'red', // Change the color to red
+    radius: 10,   // Adjust the size of the marker
+    fillColor: 'red',
+    fillOpacity: 0.8
+}).addTo(map).bindPopup('Povo');
 
 // Variables to store current route and markers
 var currentRoute = null;
@@ -95,13 +102,10 @@ function handleStartSelectChange() {
 
 // Function to apply the filter based on range and availability
 function applyFilter() {
-    var range = parseInt(document.getElementById('rangeInput').value);
+    var rangeInput = document.getElementById('rangeInput').value;
+    var range = rangeInput ? parseInt(rangeInput) : null; // Make range optional
     var availability = document.getElementById('availabilitySelect').value;
-    if (isNaN(range)) {
-        alert('Inserisci un intervallo di distanza valido.');
-        return;
-    }
-   
+
     var from = { latitude: 0, longitude: 0 };
     var startSelect = document.getElementById("startSelect").value;
 
@@ -120,14 +124,13 @@ function applyFilter() {
             return;
         }
     } else if (startSelect === "manual") {
-        var manualLat = parseFloat(document.getElementById("manualLat").value);
-        var manualLng = parseFloat(document.getElementById("manualLng").value);
-        if (!isNaN(manualLat) && !isNaN(manualLng)) {
-            from.latitude = manualLat;
-            from.longitude = manualLng;
+        // Usa le coordinate trovate tramite la via
+        if (typeof window.manualLat === "number" && typeof window.manualLng === "number") {
+            from.latitude = window.manualLat;
+            from.longitude = window.manualLng;
             sendFilterRequest(range, from, availability);
         } else {
-            alert("Inserisci latitudine e longitudine valide.");
+            alert("Cerca e seleziona un indirizzo valido prima di continuare.");
             return;
         }
     } else {
@@ -139,12 +142,20 @@ function applyFilter() {
 
 // Send the filter request to the API
 function sendFilterRequest(range, from, availability) {
-    var queryParams = `?range=${range}&from[latitude]=${from.latitude}&from[longitude]=${from.longitude}`;
+    // Costruisci la query string nel formato richiesto
+    let queryParams = `?proximity[from][latitude]=${from.latitude}&proximity[from][longitude]=${from.longitude}`;
+    if (range !== null && !isNaN(range)) {
+        queryParams = `?proximity[range]=${range}&` + queryParams.slice(1);
+    }
     if (availability !== "any") {
         queryParams += `&available=${availability}`;
     }
 
+    // Log dell'URL per il debug
     var apiUrl = `http://localhost:3000/api/v1/machines${queryParams}`;
+    console.log("API URL con filtro:", apiUrl);
+
+    // Effettua la richiesta all'API
     fetch(apiUrl, {
         headers: {
             'Authorization': `Bearer ${token}`
@@ -170,7 +181,7 @@ function sendFilterRequest(range, from, availability) {
 }
 
 // Function to generate the route between the selected start point and destination
-function generateRoute() {
+async function generateRoute() {
     var startSelect = document.getElementById("startSelect").value;
     var from = { latitude: 0, longitude: 0 };
 
@@ -188,14 +199,33 @@ function generateRoute() {
             return;
         }
     } else if (startSelect === "manual") {
-        var manualLat = parseFloat(document.getElementById("manualLat").value);
-        var manualLng = parseFloat(document.getElementById("manualLng").value);
-        if (!isNaN(manualLat) && !isNaN(manualLng)) {
-            from.latitude = manualLat;
-            from.longitude = manualLng;
-            getSelectedDestination(from);
-        } else {
-            alert("Inserisci latitudine e longitudine valide.");
+        // Ottieni la via inserita
+        const address = document.getElementById('manualAddress').value;
+        if (!address) {
+            alert("Inserisci una via o un indirizzo.");
+            return;
+        }
+        // Limita la ricerca a Trento e provincia
+        const query = `${address}, Trento, Italia`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=it&addressdetails=1&q=${encodeURIComponent(query)}`;
+        try {
+            const response = await fetch(url, {
+                headers: { 'Accept-Language': 'it' }
+            });
+            const data = await response.json();
+            const filtered = data.filter(item =>
+                item.display_name.toLowerCase().includes('trento')
+            );
+            if (filtered.length > 0) {
+                from.latitude = parseFloat(filtered[0].lat);
+                from.longitude = parseFloat(filtered[0].lon);
+                getSelectedDestination(from);
+            } else {
+                alert("Indirizzo non trovato nella provincia di Trento.");
+                return;
+            }
+        } catch (err) {
+            alert("Errore nella ricerca dell'indirizzo.");
             return;
         }
     } else {
@@ -231,9 +261,18 @@ function drawRoute(from, to) {
     if (currentStartMarker) map.removeLayer(currentStartMarker);
     if (currentEndMarker) map.removeLayer(currentEndMarker);
 
-    currentStartMarker = L.marker([from.latitude, from.longitude]).addTo(map).bindPopup('Partenza');
+    // Punto di partenza come puntino rosso
+    currentStartMarker = L.circleMarker([from.latitude, from.longitude], {
+        color: 'red', // Bordo rosso
+        radius: 6,    // Dimensione del puntino
+        fillColor: 'red', // Riempimento rosso
+        fillOpacity: 0.8  // Opacità del riempimento
+    }).addTo(map).bindPopup('Partenza');
+
+    // Punto di destinazione come marker standard
     currentEndMarker = L.marker([to.latitude, to.longitude]).addTo(map).bindPopup('Destinazione');
 
+    // Disegna il percorso tra i due punti
     currentRoute = L.Routing.control({
         waypoints: [
             L.latLng(from.latitude, from.longitude),
@@ -283,3 +322,120 @@ function resetMap() {
 
     fetchMachines();
 }
+
+// Function to get coordinates from an address
+async function getCoordsFromAddress() {
+    const address = document.getElementById('manualAddress').value;
+    if (!address) {
+        window.manualLat = null;
+        window.manualLng = null;
+        return;
+    }
+    // Limita la ricerca a Trento e provincia
+    const query = `${address}, Trento, Italia`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=it&addressdetails=1&q=${encodeURIComponent(query)}`;
+    try {
+        const response = await fetch(url, {
+            headers: { 'Accept-Language': 'it' }
+        });
+        const data = await response.json();
+        // Filtra ulteriormente per provincia di Trento se necessario
+        const filtered = data.filter(item =>
+            item.display_name.toLowerCase().includes('trento')
+        );
+        if (filtered.length > 0) {
+            window.manualLat = parseFloat(filtered[0].lat);
+            window.manualLng = parseFloat(filtered[0].lon);
+        } else {
+            window.manualLat = null;
+            window.manualLng = null;
+        }
+    } catch (err) {
+        window.manualLat = null;
+        window.manualLng = null;
+    }
+}
+
+// Address suggestions functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const manualAddressInput = document.getElementById('manualAddress');
+    const suggestionsDiv = document.getElementById('addressSuggestions');
+    let suggestionsList = [];
+    let selectedSuggestion = -1;
+
+    manualAddressInput.addEventListener('input', async function() {
+        const query = manualAddressInput.value.trim();
+        suggestionsDiv.innerHTML = '';
+        suggestionsList = [];
+        selectedSuggestion = -1;
+        if (query.length < 3) return;
+
+        const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=it&addressdetails=1&limit=8&q=${encodeURIComponent(query + ', Trentino, Italia')}`;
+        try {
+            const response = await fetch(url, { headers: { 'Accept-Language': 'it' } });
+            const data = await response.json();
+            const filtered = data.filter(item =>
+                (item.address && (
+                    (item.address.state && item.address.state.toLowerCase().includes('trento')) ||
+                    (item.address.county && item.address.county.toLowerCase().includes('trento')) ||
+                    (item.display_name && item.display_name.toLowerCase().includes('trento'))
+                )) &&
+                item.type === "road"
+            );
+            if (filtered.length > 0) {
+                suggestionsList = filtered;
+                filtered.forEach((item, idx) => {
+                    const div = document.createElement('div');
+                    const regex = new RegExp(`(${query})`, 'ig');
+                    div.innerHTML = item.display_name.replace(regex, '<b>$1</b>');
+                    div.addEventListener('click', () => {
+                        manualAddressInput.value = item.display_name;
+                        suggestionsDiv.innerHTML = '';
+                        window.manualLat = parseFloat(item.lat);
+                        window.manualLng = parseFloat(item.lon);
+                    });
+                    suggestionsDiv.appendChild(div);
+                });
+            }
+        } catch (err) {
+            // Silenzia errori di rete
+        }
+    });
+
+    manualAddressInput.addEventListener('keydown', function(e) {
+        if (!suggestionsList.length) return;
+        const items = suggestionsDiv.querySelectorAll('div');
+        if (e.key === "ArrowDown") {
+            selectedSuggestion = (selectedSuggestion + 1) % items.length;
+            updateActiveSuggestion(items);
+            e.preventDefault();
+        } else if (e.key === "ArrowUp") {
+            selectedSuggestion = (selectedSuggestion - 1 + items.length) % items.length;
+            updateActiveSuggestion(items);
+            e.preventDefault();
+        } else if (e.key === "Enter") {
+            if (selectedSuggestion >= 0 && items[selectedSuggestion]) {
+                items[selectedSuggestion].click();
+                e.preventDefault();
+            }
+        }
+    });
+
+    function updateActiveSuggestion(items) {
+        items.forEach((item, idx) => {
+            if (idx === selectedSuggestion) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!manualAddressInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.innerHTML = '';
+            suggestionsList = [];
+            selectedSuggestion = -1;
+        }
+    });
+});

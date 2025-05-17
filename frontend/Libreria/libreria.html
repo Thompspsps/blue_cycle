@@ -8,19 +8,21 @@
 </head>
 <body>
     <header>
-        <a style="color: white; font-size: 20px;" href="/Home/home.html" class="home-arrow">Home ☞</a>
-        <h1>Libreria Coupon</h1>
-        <input type="text" id="search" placeholder="Cerca coupon...">
-        <button id="toggle-view">Vedi Coupon Scaduti o Usati</button>
+        <a href="/Home/home.html" class="home-arrow">Home ☞</a>
     </header>
     <main>
+        <h1 class="library-title">Libreria Coupon</h1>
+        <div class="library-filters">
+            <input type="text" id="search" placeholder="Cerca coupon...">
+            <button id="toggle-view">Vedi Coupon Scaduti o Usati</button>
+        </div>
         <div id="coupon-container"></div>
     </main>
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <div id="coupon-details"></div>
-            <svg id="barcode"></svg> <!-- Usa un tag SVG per JsBarcode -->
+            <svg id="barcode"></svg>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

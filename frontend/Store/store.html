@@ -3,47 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Dinamica di Immagini Cliccabili</title>
+    <title>Store Coupon</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <a  href="/Home/home.html" class="home-arrow">Home ☞</a>
-        <h1 style="margin: auto;">Store Coupon</h1>
-        
+        <a href="/Home/home.html" class="home-arrow">☜ Home</a>
     </header>
     <main>
-        <div class="container">
-            <h1>Lista Coupon</h1>
-            <div id="image-list" class="image-list"></div>
-        </div>
+        <!-- Visualizzazione punti utente -->
+        <div class="user-points" id="userPoints">Punti: ...</div>
+
+        <!-- Bottone Filtra -->
+        <button id="filter-button" class="filter-btn">Filtra Coupon</button>
+
+        <!-- Lista Coupon -->
+        <section class="coupon-section">
+            <h2>Negozio Coupon</h2>
+            <div id="image-list" class="coupon-grid"></div>
+        </section>
+
+        <!-- Lista Coupon Preferiti -->
+        <section class="coupon-section">
+            <h2>I Tuoi Preferiti</h2>
+            <div id="coupon-list" class="coupon-grid"></div>
+        </section>
 
         <!-- Finestra Modale -->
         <div id="modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <div id="modal-details"></div>
-                <img id="wishlist-heart" src="heart.jpg" class="wishlist-heart" alt="Aggiungi ai preferiti">
-                <button id="buy-button" class="buy-button">Compra</button>
+                <div class="modal-actions">
+                    <button id="wishlist-heart" class="wishlist-heart">❤️</button>
+                    <button id="buy-button" class="buy-button">Compra Ora</button>
+                </div>
             </div>
         </div>
 
-        <div class="container">
-            <h1>Lista Coupon Preferiti</h1>
-            <div id="coupon-list" class="image-list"></div>
-        </div>
-        
-        <!-- Finestra Modale Preferiti -->
-        <div id="modal-preferiti" class="modal">
+        <!-- Modale Filtri -->
+        <div id="filter-modal" class="modal" style="display:none;">
             <div class="modal-content">
-                <span class="close">&times;</span>
-                <div id="modal-details-preferiti"></div>
-                <button id="remove-favorite" class="wishlist-heart">
-                    <img src="heart.jpg" alt="Rimuovi dai preferiti">
-                </button>
+                <span class="close" id="close-filter-modal">&times;</span>
+                <h2>Filtra Coupon</h2>
+                <label for="filter-name">Nome:</label>
+                <input type="text" id="filter-name" placeholder="Nome coupon">
+                <br><br>
+                <label for="filter-price">Prezzo massimo:</label>
+                <input type="number" id="filter-price" min="0" placeholder="Prezzo massimo">
+                <br><br>
+                <button id="confirm-filter">Conferma</button>
             </div>
         </div>
     </main>
+    <footer>
+        <p>© 2025 Store Coupon. Tutti i diritti riservati.</p>
+    </footer>
     <script src="script.js"></script>
 </body>
 </html>

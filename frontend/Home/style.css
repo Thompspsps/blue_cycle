@@ -1,27 +1,29 @@
-/* Aggiungi un effetto gradient al background */
+/* Stile generale */
 body {
-    background: linear-gradient(to right, #64dbfc, #539cf5);
+    background: linear-gradient(90deg, #e3e4e8 0%, #f3f4f6 100%);
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    color: #333;
+    color: #1e3c72;
 }
 
-/* Migliora la grafica dell'header */
+/* Header */
 header {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding-top: 1%;
-    padding-bottom: 1%;
-    background-color: #0587c4;
-    color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 header h1 {
     margin: 0;
     font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 /* Migliora la grafica dei bottoni */
@@ -38,19 +40,22 @@ header h1 {
     align-items: center;
     justify-content: center;
     padding: 15px 30px;
-    background-color: #28a745; /* Cambia lo sfondo del bottone */
-    color: white;
+    background: linear-gradient(90deg,#2a5298  0%, #1e3c72 100%);
+    color: #fff;
     text-decoration: none;
-    border-radius: 4px;
-    flex-basis: calc(50% - 20px); /* Due bottoni per riga con gap */
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    flex-basis: calc(50% - 20px);
     box-sizing: border-box;
     text-align: center;
-    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.2s;
 }
 
 .nav-button:hover {
-    background-color: #218838; /* Cambia il colore di sfondo al passaggio del mouse */
-    transform: scale(1.05);
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Migliora la grafica del main */
@@ -61,6 +66,7 @@ main {
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin: 20px;
+    color: #1e3c72;
 }
 
 /* Stili per la finestra modale */
@@ -77,24 +83,30 @@ main {
 }
 
 .modal-content {
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
+    background: linear-gradient(135deg, #e3e4e8 0%, #f3f4f6 100%);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30, 60, 114, 0.12);
+    margin: 10% auto;
+    padding: 32px 28px 28px 28px;
+    width: 340px;
+    max-width: 90vw;
+    border: none;
+    position: relative;
     text-align: center;
+    color: #1e3c72;
 }
 
 .close {
-    color: #aaa;
+    color: #1e3c72;
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
 .close:hover, .close:focus {
-    color: black;
+    color: #ffcc00;
     text-decoration: none;
     cursor: pointer;
 }
@@ -110,9 +122,23 @@ main {
     height: 256px;
 }
 
+/* Footer stile coerente */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 0 0 12px 12px;
+}
+
 /* Media query per dispositivi mobili */
 @media (max-width: 600px) {
     .nav-button {
-        flex-basis: calc(50% - 10px); /* Due bottoni per riga con gap ridotto */
+        flex-basis: calc(50% - 10px);
+    }
+    main {
+        padding: 20px;
+        margin: 10px;
     }
 }

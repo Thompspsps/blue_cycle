@@ -11,7 +11,7 @@
 </head>
 <body>
   <header>
-    <a href="/Home/home.html" class="home-arrow">Home ☞</a>
+    <a href="/Home/home.html" class="home-arrow">☜ Home</a>
   </header>
   <div id="map"></div>
   <div id="controls">
@@ -22,8 +22,11 @@
       <option value="manual">Inserimento manuale</option>
     </select>
     <div id="manualCoords" style="display:none;">
-      <label>Latitudine: <input type="text" id="manualLat" /></label>
-      <label>Longitudine: <input type="text" id="manualLng" /></label>
+      <div style="position:relative;">
+        <label for="manualAddress">Via/Indirizzo:</label>
+        <input type="text" id="manualAddress" placeholder="Inserisci via o indirizzo" autocomplete="off" />
+        <div id="addressSuggestions" class="suggestions"></div>
+      </div>
     </div>
     <select id="poiSelect">
       <option value="">Seleziona un punto di interesse</option>
@@ -41,6 +44,7 @@
   <div id="filterModal" style="display:none;">
     <div>
       <h2>Filtra Ecocompattatori</h2>
+      <span class="close" onclick="closeFilterModal()" style="position:absolute;top:12px;right:18px;font-size:28px;cursor:pointer;">&times;</span>
       <label>Range (km): <input type="number" id="rangeInput" /></label>
       <label>Disponibilità: 
         <select id="availabilitySelect">

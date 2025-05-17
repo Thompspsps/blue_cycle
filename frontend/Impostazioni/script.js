@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const languageSelector = document.getElementById('language');
     const authKey = "50f80a6e-c8dd-b682-b1c4-c4040da3bef4:fx";//ATTENZIONEEEEEE
 
+    const userId = localStorage.getItem("Id");
+    const accessToken = localStorage.getItem('Token');
+    console.log("userId:", userId);
+    console.log("accessToken:", accessToken);
+
+    if (!userId || !accessToken) {
+        alert("Sessione scaduta o non valida. Effettua di nuovo il login.");
+        return;
+    }
+
     // Funzione per tradurre il testo utilizzando l'API di DeepL
     const translateText = async (text, targetLang) => {
         const url = `https://api-free.deepl.com/v2/translate?auth_key=${authKey}&text=${encodeURIComponent(text)}&target_lang=${targetLang.toUpperCase()}`;
@@ -54,36 +64,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Funzione per cambiare la password
-    const changePassword = async (userId, oldPassword, newPassword) => {
-        // Cifra le password usando SHA-512
-        const hashedOldPassword = CryptoJS.SHA512(oldPassword).toString();
-        const hashedNewPassword = CryptoJS.SHA512(newPassword).toString();
+    const changePassword = async () => {
+        const userId = localStorage.getItem("Id");
+        const accessToken = localStorage.getItem('Token');
+        const oldPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
 
-        const accessToken = localStorage.getItem('accessToken'); // Recupera il token di autorizzazione
+        const response = await fetch(`http://localhost:3000/api/v1/users/${userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                oldPassword: oldPassword,
+                newPassword: newPassword
+            })
+        });
 
-        try {
-            const response = await fetch(`http://127.0.0.1/api/v1/users/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}` // Includi il token di autorizzazione
-                },
-                body: JSON.stringify({ 
-                    oldPassword: hashedOldPassword, 
-                    newPassword: hashedNewPassword 
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Errore durante il cambio della password.');
-            }
-
-            const data = await response.json();
+        if (response.ok) {
             alert('Password cambiata con successo!');
-            return data;
-        } catch (error) {
-            alert(`Errore: ${error.message}`);
-            return null;
+        } else {
+            const data = await response.json();
+            alert(`Errore: ${data.message || response.statusText}`);
         }
     };
 
@@ -92,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // Previene il comportamento predefinito del form
 
-        // Ottieni i valori degli input
         const oldPassword = document.getElementById('current-password').value;
         const newPassword = document.getElementById('new-password').value;
 
@@ -102,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const userId = '123'; // Sostituisci con l'ID reale dell'utente
-        await changePassword(userId, oldPassword, newPassword);
+        await changePassword();
     });
 });

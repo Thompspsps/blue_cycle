@@ -26,8 +26,13 @@ async function postData(email, password) {
 
         const responseData = await response.json();
         console.log('Risposta del server:', responseData);
+
+        // Notifica e redirect se la registrazione va a buon fine
+        alert('Registrazione avvenuta con successo! La password ti è stata inviata via email.');
+        window.location.href = '/Login/login.html';
     } catch (error) {
         console.error('Errore:', error);
+        alert('Registrazione fallita. Riprova.');
     }
 }
 

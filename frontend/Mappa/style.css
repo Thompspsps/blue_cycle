@@ -1,36 +1,301 @@
-body
-{
-  background: linear-gradient(to right, #64dbfc, #539cf5);
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(90deg, #e3e4e8 0%, #f3f4f6 100%);
+    margin: 0;
+    padding: 0;
+    color: #1e3c72;
 }
 
-#map { 
-    height: 80vh; 
-  }
-  
-  #controls { 
-    padding: 10px; 
-  }
-  
-  button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    font-size: 16px;
-  }
-  
-  select, input {
-    padding: 5px;
-    font-size: 16px;
-    margin-right: 10px;
-  }
-  
-  label {
+header {
+    width: 100%;
+    background: #1e3c72;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.home-arrow {
+    font-family: Arial, sans-serif;
+    text-decoration: none;
+    font-size: 18px;
+    color: #fff;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.home-arrow:hover {
+    color: #ffcc00;
+    transform: translateX(-5px);
+}
+
+#map {
+    height: 70vh;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(30, 60, 114, 0.12);
+    margin: 30px auto 20px auto;
     display: block;
-    margin-top: 5px;
-  }
-  
-  
-header .home-arrow {
-  text-decoration: none;
-  font-size: 20px;
-  color: white; /* Colore della freccia */
+    max-width: 1000px;
+}
+
+#controls {
+    padding: 20px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-width: 1000px;
+    margin: 20px auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+#controls label {
+    font-weight: bold;
+    color: #1e3c72;
+    margin-right: 8px;
+    margin-top: 0;
+}
+
+#controls select,
+#controls input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1.5px solid #1e3c72;
+    border-radius: 8px;
+    background: #fff;
+    color: #1e3c72;
+    margin-right: 10px;
+    transition: border 0.2s;
+}
+
+#controls select:focus,
+#controls input:focus {
+    border: 1.5px solid #2a5298;
+    outline: none;
+}
+
+#controls button {
+    margin-top: 0;
+    padding: 10px 24px;
+    background: linear-gradient(90deg,#2a5298  0%, #1e3c72 100%);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.2s;
+}
+
+#controls button:hover {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 0 0 12px 12px;
+    margin-top: 40px;
+}
+
+/* Migliora lo stile della modale filtri */
+#filterModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.4);
+}
+
+#filterModal > div {
+    background: linear-gradient(135deg, #e3e4e8 0%, #f3f4f6 100%);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30, 60, 114, 0.12);
+    margin: 8% auto;
+    padding: 32px 28px 28px 28px;
+    width: 340px;
+    max-width: 90vw;
+    border: none;
+    position: relative;
+    text-align: center;
+    color: #1e3c72;
+    animation: modalFadeIn 0.3s;
+}
+
+#filterModal h2 {
+    color: #1e3c72;
+    margin-bottom: 18px;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+#filterModal label {
+    font-weight: 600;
+    color: #1e3c72;
+    margin-bottom: 6px;
+    display: block;
+    text-align: left;
+}
+
+#filterModal input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    border: 1.5px solid #1e3c72;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: #1e3c72;
+    transition: border 0.2s;
+}
+
+#filterModal select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    border: 1.5px solid #1e3c72;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: #1e3c72;
+    transition: border 0.2s;
+}
+
+#filterModal button {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px 8px 0 8px;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+    transition: background 0.2s, transform 0.2s;
+    display: inline-block;
+}
+
+#filterModal button:hover {
+    background: linear-gradient(90deg, #2a5298 0%, #1e3c72 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#filterModal .close {
+    color: #1e3c72;
+    transition: color 0.2s;
+}
+
+#filterModal .close:hover {
+    color: #ffcc00;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-40px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* Aggiungi nel tuo style.css */
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #2a5298;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    margin-top: 2px;
+    box-shadow: 0 4px 16px rgba(30,60,114,0.13);
+    border-radius: 12px;
+    padding: 4px 0;
+    display: block;
+    animation: fadeInSuggestions 0.22s;
+}
+
+@keyframes fadeInSuggestions {
+    from { opacity: 0; transform: translateY(-8px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+.suggestions div {
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 1px solid #e3e4e8;
+    background: #f3f4f6;
+    color: #1e3c72;
+    font-size: 1.04rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestions div:last-child {
+    border-bottom: none;
+}
+
+.suggestions div.active, .suggestions div:hover {
+    background: linear-gradient(90deg, #e3e4e8 0%, #dbeafe 100%);
+    color: #2a5298;
+    font-weight: bold;
+}
+
+#manualCoords label {
+    font-weight: bold;
+    color: #1e3c72;
+    margin-bottom: 8px;
+    display: block;
+    position: relative;
+}
+
+#manualAddress {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #1e3c72;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #fff;
+    color: #1e3c72;
+    margin-top: 6px;
+    box-sizing: border-box;
+    transition: border 0.2s;
+}
+
+#manualAddress:focus {
+    border: 1.5px solid #2a5298;
+    outline: none;
+}
+
+@media (max-width: 600px) {
+    #map {
+        height: 40vh;
+        margin: 10px auto;
+    }
+    #controls {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+        margin: 10px;
+    }
+    .suggestions {
+        font-size: 0.97rem;
+        max-height: 140px;
+    }
+    #manualAddress {
+        font-size: 0.97rem;
+    }
 }

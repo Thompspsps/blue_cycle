@@ -15,6 +15,10 @@ const app=express();
 
 const bcrypt=require("bcrypt");
 
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger/api_doc.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // express middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true})); //false

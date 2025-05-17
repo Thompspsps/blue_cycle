@@ -1,6 +1,7 @@
+/* Stile generale */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to right, #64dbfc, #539cf5);
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f3f4f6, #e3e4e8);
     margin: 0;
     padding: 0;
     color: #333;
@@ -9,116 +10,201 @@ body {
 header {
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    background-color: #0587c4;/* Slightly more opaque */
-    color: white;
-    padding-top:0.5% ;
-    padding-bottom: 0.5%;
-    text-align: center; /* Added some padding */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added a subtle shadow */
+    justify-content: center; /* centra il contenuto */
+    align-items: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
 }
+
+header h1 {
+    font-size: 28px;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
 
 .home-arrow {
+    font-family: Arial, sans-serif;
     text-decoration: none;
-    font-size: 20px;
-    color: white; /* Colore della freccia */
+    font-size: 18px;
+    color: #fff;
+    transition: color 0.3s, transform 0.3s;
 }
 
-
-.user-info, .user-score {
-    display: flex;
-    align-items: center;
-    padding: 0.5%;
+.home-arrow:hover {
+    color: #ffcc00;
+    transform: translateX(-5px);
+}
+main {
+    margin-top: 80px;
 }
 
-.wishlist-heart {
-    position: relative;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+footer {
     text-align: center;
+    padding: 20px;
+    background: #1e3c72;
+    color: #fff;
+    font-size: 14px;
 }
 
-h1 {
-    color: #000000;
+/* Sezioni Coupon */
+.coupon-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 28px 20px 32px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #f9fafb 80%, #e3e4e8 100%);
+    border-radius: 22px;
+    box-shadow: 0 4px 24px rgba(30,60,114,0.07);
+    border: 1.5px solid #e3e4e8;
+    /* Spazio tra le due sezioni */
+    margin-bottom: 36px;
+    /* Per separare visivamente le due aree */
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+
+.coupon-section h2 {
     font-size: 32px;
     margin-bottom: 20px;
-    text-align: center; /* Center the title */
+    color: #1e3c72;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: none;
 }
 
-.image-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+.coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
-.image-container {
-    flex-basis: calc(50% - 10px); /* 2 images per row with a small margin */
-    margin: 10px 0;
-    text-align: center;
-}
-
-.image-container img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+/* Stile dei pulsanti dei coupon */
+.coupon-button {
+    background: linear-gradient(to right, #ffffff, #f9f9f9);
+    border: 2px solid #ddd;
     border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+    position: relative;
 }
 
-.image-container img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+.coupon-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to right, #f3f4f6, #e3e4e8);
 }
 
-.image-info {
-    margin-top: 10px;
-    font-weight: bold;
-    background-color: #e0f2f1;
-    padding: 10px;
-    border-radius: 8px;
+.coupon-button .coupon-content h3 {
+    font-size: 20px;
+    margin: 10px 0;
+    color: #1e3c72;
+    text-transform: uppercase;
 }
 
-.image-info .name, .image-info .price {
-    display: block;
+.coupon-button .coupon-content p {
+    font-size: 16px;
     margin: 5px 0;
-    color: #007bb5;
+    color: #555;
 }
 
+/* Pulsanti azione nei coupon */
+.add-favorite, .remove-favorite {
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.add-favorite:hover, .remove-favorite:hover {
+    background: #ff0000;
+    transform: scale(1.1);
+}
+
+/* Stile per il modal */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
-    background-color: #ffffff;
-    margin: 15% auto;
+    background-color: #fff;
+    margin: 10% auto;
     padding: 20px;
-    border: 1px solid #ccc;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: left;
+    border: 1px solid #888;
+    width: 300px;
+    border-radius: 8px;
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    color: #1e3c72;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.modal-content .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.modal-content .wishlist-heart {
+    font-size: 24px;
+    color: #ff4d4d;
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.modal-content .wishlist-heart:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+.modal-content .buy-button {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.modal-content .buy-button:hover {
+    background: linear-gradient(to right, #ffcc00, #ff9900);
+    transform: scale(1.1);
+    color: #333;
 }
 
 .close {
@@ -126,27 +212,136 @@ h1 {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.close:hover, .close:focus {
+.close:hover {
     color: #000;
-    text-decoration: none;
-    cursor: pointer;
 }
 
-.buy-button {
-    background-color: #007bb5;
-    color: white;
+/* Stile per il pulsante filtro */
+.filter-btn {
+    background: linear-gradient(90deg,#2a5298  0%, #1e3c72 100%);
+    color: #fff;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
+    border-radius: 25px;
+    padding: 12px 32px;
+    font-size: 1.1rem;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 14px;
+    margin: 20px auto 30px auto;
     display: block;
-    margin: 20px auto 0;
-    transition: background-color 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.2s;
 }
 
-.buy-button:hover {
-    background-color: #005f8c;
+.filter-btn:hover {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+/* Miglioramento stile modale filtri */
+#filter-modal .modal-content {
+    background: linear-gradient(135deg, #e3e4e8 0%, #f3f4f6 100%);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30, 60, 114, 0.12);
+    padding: 32px 28px 28px 28px;
+    width: 300px;
+    max-width: 90vw;
+    border: none;
+    position: relative;
+    animation: modalFadeIn 0.3s;
+}
+
+#filter-modal h2 {
+    color: #1e3c72;
+    margin-bottom: 18px;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+#filter-modal label {
+    font-weight: 600;
+    color: #1e3c72;
+    margin-bottom: 6px;
+    display: block;
+}
+
+#filter-modal input[type="text"],
+#filter-modal input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    border: 1.5px solid #1e3c72;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: #1e3c72;
+    transition: border 0.2s;
+}
+
+#filter-modal input:focus {
+    border: 1.5px solid #1e3c72;
+    outline: none;
+}
+
+#confirm-filter {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+    transition: background 0.2s, transform 0.2s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#confirm-filter:hover {
+    background: linear-gradient(90deg, #2a5298 0%, #1e3c72 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#close-filter-modal {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 28px;
+    color: #1e3c72;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#close-filter-modal:hover {
+    color: #ffcc00;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-40px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+/* Stile per i punti utente */
+.user-points {
+    display: block;
+    margin: 40px auto 30px auto;
+    padding: 18px 38px;
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(30,60,114,0.13);
+    text-align: center;
+    letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s;
+    cursor: default;
+    max-width: 320px;
 }

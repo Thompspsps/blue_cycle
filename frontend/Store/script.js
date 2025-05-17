@@ -3,238 +3,272 @@ document.addEventListener("DOMContentLoaded", () => {
     const couponList = document.getElementById('coupon-list');
     const modal = document.getElementById('modal');
     const modalDetails = document.getElementById('modal-details');
-    const span = document.getElementsByClassName('close')[0];
+    const closeModalButton = document.getElementsByClassName('close')[0];
     const buyButton = document.getElementById('buy-button');
     const wishlistHeart = document.getElementById('wishlist-heart');
-    const userId = localStorage.getItem("Id"); // Recupera l'ID utente da localStorage
-    const token = localStorage.getItem("Token"); // Recupera il token da localStorage
+    const userId = localStorage.getItem("Id");
+    const token = localStorage.getItem("Token");
+    const userScoreElement = document.createElement('div'); // Elemento per il punteggio dell'utente
+    userScoreElement.id = 'user-score';
+    userScoreElement.style.textAlign = 'center';
+    userScoreElement.style.marginTop = '20px';
+    document.body.insertBefore(userScoreElement, document.body.firstChild);
 
-    // Funzione per ottenere i prototipi dei coupon dall'API
-    async function getCouponPrototypes() {
-        try {
-            const response = await fetch('http://localhost:3000/api/v1/couponPrototypes', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const result = await response.json();
-            if (result.success) {
-                return result.data;
-            } else {
-                console.error(result.message);
-                return [];
+    const apiBaseUrl = "http://localhost:3000/api/v1";
+
+    // Funzione per effettuare richieste API
+    const apiRequest = async (url, method = 'GET', body = null) => {
+        const options = {
+            method,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-        } catch (error) {
-            console.error('Errore nel recupero dei prototipi dei coupon:', error);
-            return [];
-        }
-    }
+        };
+        if (body) options.body = JSON.stringify(body);
 
-    // Funzione per ottenere i preferiti dall'API
-    async function getWishlistedCoupons() {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userId}/wishlistedCoupons`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetch(url, options);
             const result = await response.json();
+            console.log(`[API ${method}] ${url} →`, result); // Log della risposta del server
             if (result.success) {
-                return result.data;
-            } else {
-                console.error(result.message);
-                return [];
+                // Restituisci true se l'operazione è andata a buon fine, anche se data è null
+                return result.data !== undefined ? (result.data === null ? true : result.data) : true;
             }
+            console.error(result.message);
+            return false;
         } catch (error) {
-            console.error('Errore nel recupero dei preferiti:', error);
-            return [];
+            console.error(`Errore nella richiesta API (${method} ${url}):`, error);
+            return false;
         }
-    }
+    };
 
-    // Funzione per creare un container per le immagini dei coupon
-    const createImage = (product) => {
-        const imageContainer = document.createElement('div');
-        imageContainer.classList.add('image-container');
+    // Funzione per aggiornare il punteggio dell'utente
+    const updateUserScore = async () => {
+        const userData = await apiRequest(`${apiBaseUrl}/users/${userId}`);
+        if (userData && typeof userData.points !== "undefined") {
+            userScoreElement.innerHTML = `<h3>Punteggio Utente: ${userData.points}</h3>`;
+            document.getElementById('userPoints').textContent = `Punti: ${userData.points}`;
+        } else {
+            userScoreElement.innerHTML = `<h3>Punteggio Utente: --</h3>`;
+            document.getElementById('userPoints').textContent = `Punti: --`;
+        }
+    };
 
-        const img = document.createElement('img');
-        img.src = product.immagine; // link foto
+    // Funzione per creare un pulsante per un coupon
+    const createCouponButton = (coupon, isFavorite = false) => {
+        const button = document.createElement('button');
+        button.classList.add('coupon-button');
+        button.innerHTML = `
+            <div class="coupon-content">
+                <h3>${coupon.nome}</h3>
+                <p>Prezzo: ${coupon.prezzo} €</p>
+                <p>Sconto: ${coupon.sconto}%</p>
+            </div>
+        `;
 
-        const infoContainer = document.createElement('div');
-        infoContainer.classList.add('image-info');
-
-        const nameSpan = document.createElement('span');
-        nameSpan.classList.add('name');
-        nameSpan.textContent = product.nome;
-
-        const priceSpan = document.createElement('span');
-        priceSpan.classList.add('price');
-        priceSpan.textContent = `${product.prezzo}`;
-
-        infoContainer.appendChild(nameSpan);
-        infoContainer.appendChild(priceSpan);
-        imageContainer.appendChild(img);
-        imageContainer.appendChild(infoContainer);
-
-        // Event listener per aprire il modal con i dettagli del coupon
-        img.addEventListener('click', () => {
+        button.addEventListener('click', () => {
             modalDetails.innerHTML = `
-                <h2>${product.nome}</h2>
-                <p><strong>Sconto:</strong> ${product.sconto}%</p>
-                <p><strong>Prezzo:</strong> ${product.prezzo}</p>
-                <p><strong>Descrizione:</strong> ${product.descrizione}</p>
+                <h2>${coupon.nome}</h2>
+                <p><strong>Sconto:</strong> ${coupon.sconto}%</p>
+                <p><strong>Prezzo:</strong> ${coupon.prezzo} €</p>
+                <p><strong>Descrizione:</strong> ${coupon.descrizione}</p>
             `;
-            modal.setAttribute('data-product-id', product.self);
-            modal.setAttribute('data-product-store', product.store);
+            modal.setAttribute('data-product-id', coupon.self);
+            modal.setAttribute('data-is-favorite', isFavorite);
             modal.style.display = "block";
         });
 
-        return imageContainer;
+        return button;
     };
 
-    // Chiudi il modal cliccando sulla "X"
-    span.onclick = () => {
+    // Funzione per chiudere il modal
+    const closeModal = () => {
         modal.style.display = "none";
     };
 
-    // Chiudi il modal cliccando fuori dal modal
+    closeModalButton.onclick = closeModal;
     window.onclick = (event) => {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
+        if (event.target === modal) closeModal();
     };
 
-    // Azione del bottone "Compra"
-    buyButton.onclick = async () => {
-        const productSelf = modal.getAttribute('data-product-id')
+    // Elementi filtro
+    const filterButton = document.getElementById('filter-button');
+    const filterModal = document.getElementById('filter-modal');
+    const closeFilterModal = document.getElementById('close-filter-modal');
+    const confirmFilter = document.getElementById('confirm-filter');
+    const filterName = document.getElementById('filter-name');
+    const filterPrice = document.getElementById('filter-price');
 
-        try {
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userId}/coupons`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ self: productSelf })
-            });
+    let allCoupons = []; // Per mantenere la lista completa
 
-            const result = await response.json();
-            if (result.success) {
-                alert('Hai comprato il prodotto!');
-            } else {
-                alert('Errore nell\'acquisto del prodotto');
-            }
-        } catch (error) {
-            console.error('Errore nell\'acquisto del prodotto:', error);
-            alert('Errore nel tentativo di acquistare il prodotto');
-        }
+    // Mostra/nascondi modale filtro
+    filterButton.onclick = () => { filterModal.style.display = 'block'; };
+    closeFilterModal.onclick = () => { filterModal.style.display = 'none'; };
+    window.addEventListener('click', (e) => {
+        if (e.target === filterModal) filterModal.style.display = 'none';
+    });
 
-        modal.style.display = "none";
-    };
-
-    // Aggiungi ai preferiti
-    wishlistHeart.onclick = async () => {
-        const productSelf =    modal.getAttribute('data-product-id')
-        console.log("Self: "+productSelf);
-        try {
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userId}/wishlistedCoupons`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                
-                body: JSON.stringify({ couponPrototype: productSelf })
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                alert('Aggiunto ai preferiti');
-                loadWishlistedCoupons();
-            } else {
-                alert('Errore nell\'aggiunta ai preferiti');
-            }
-        } catch (error) {
-            console.error('Errore nell\'aggiunta ai preferiti:', error);
-            alert('Errore nel tentativo di aggiungere ai preferiti');
-        }
-
-        modal.style.display = "none";
-    };
-
-    // Rimuovi dai preferiti
-    const removeFromWishlist = async (itemSelf) => {
-        try {
-            
-            const response = await fetch(`http://localhost:3000/api/v1/users/${userId}/wishlistedCoupons/${itemSelf}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                alert('Rimosso dai preferiti');
-                loadWishlistedCoupons();
-            } else {
-                alert('Errore nella rimozione dai preferiti');
-            }
-        } catch (error) {
-            console.error('Errore nella rimozione dai preferiti:', error);
-            alert('Errore nel tentativo di rimuovere dai preferiti');
-        }
-    };
-
-    // Funzione per caricare e visualizzare i coupon
-    const loadCoupons = async () => {
-        const coupons = await getCouponPrototypes();
-        imageList.innerHTML = ''; 
+    // Sovrascrivi loadCoupons per salvare tutti i coupon
+    const originalLoadCoupons = async () => {
+        const coupons = await apiRequest(`${apiBaseUrl}/couponPrototypes`);
+        if (!coupons) return;
+        imageList.innerHTML = '';
         coupons.forEach(coupon => {
-            const product = {
+            const couponData = {
                 self: coupon.self,
                 nome: coupon.description,
                 sconto: coupon.discount,
+                store: coupon.store,
                 prezzo: coupon.price,
                 descrizione: coupon.description,
-                immagine: 'https://via.placeholder.com/150', // Placeholder, replace with actual image if available
-                store: coupon.store
             };
-            const image = createImage(product);
-            imageList.appendChild(image);
+            const couponButton = createCouponButton(couponData);
+            imageList.appendChild(couponButton);
         });
     };
 
-    // Funzione per caricare e visualizzare i coupon nei preferiti
-    const loadWishlistedCoupons = async () => {
-        const wishlistedCoupons = await getWishlistedCoupons();
-        couponList.innerHTML = ''; // Clear existing list
-        wishlistedCoupons.forEach(coupon => {
-            const product = {
+    const loadCouponsWithSave = async () => {
+        const coupons = await apiRequest(`${apiBaseUrl}/couponPrototypes`);
+        if (!coupons) return;
+        allCoupons = coupons; // Salva tutti i coupon
+        renderCoupons(coupons);
+    };
+
+    const renderCoupons = (coupons) => {
+        imageList.innerHTML = '';
+        coupons.forEach(coupon => {
+            const couponData = {
                 self: coupon.self,
-                nome: coupon.couponPrototype, // Assuming description is stored in couponPrototype
+                nome: coupon.description,
                 sconto: coupon.discount,
+                store: coupon.store,
                 prezzo: coupon.price,
                 descrizione: coupon.description,
-                immagine: 'https://via.placeholder.com/150', // Placeholder, replace with actual image if available
-                store: coupon.store
             };
-            const couponElement = createImage(product);
-            // Aggiungi un elemento per rimuovere dai preferiti, come un bottone o un'icona
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Rimuovi dai preferiti';
-            removeButton.onclick = () => removeFromWishlist(coupon.self);
-            couponElement.appendChild(removeButton);
-            couponList.appendChild(couponElement);
+            const couponButton = createCouponButton(couponData);
+            imageList.appendChild(couponButton);
         });
     };
 
-    // Inizializza il caricamento dei coupon e dei preferiti
+    // Sostituisci la chiamata a loadCoupons con loadCouponsWithSave
+    const loadCoupons = loadCouponsWithSave;
+
+    // Applica i filtri quando si preme "Conferma"
+    confirmFilter.onclick = () => {
+        let filtered = allCoupons;
+        const name = filterName.value.trim().toLowerCase();
+        const price = parseFloat(filterPrice.value);
+
+        if (name) {
+            filtered = filtered.filter(c => c.description.toLowerCase().includes(name));
+        }
+        if (!isNaN(price)) {
+            filtered = filtered.filter(c => c.price <= price);
+        }
+        renderCoupons(filtered);
+        filterModal.style.display = 'none';
+    };
+
+    // Funzione per caricare i coupon preferiti in modo più efficiente
+    const loadWishlistedCoupons = async () => {
+        const wishlistedCoupons = await apiRequest(`${apiBaseUrl}/users/${userId}/wishlistedCoupons`);
+        if (!wishlistedCoupons) return;
+
+        couponList.innerHTML = '';
+        // Preleva tutti gli id dei prototipi dei coupon preferiti
+        const prototypeIds = wishlistedCoupons.map(c => c.couponPrototype.split('/').pop());
+        // Chiamata batch per tutti i dettagli dei coupon preferiti (se il backend lo supporta)
+        const detailsPromises = prototypeIds.map(id =>
+            apiRequest(`${apiBaseUrl}/couponPrototypes/${id}`)
+        );
+        const details = await Promise.all(detailsPromises);
+
+        details.forEach((couponDetails, idx) => {
+            if (!couponDetails) return;
+            const couponData = {
+                self: couponDetails.self,
+                nome: couponDetails.description,
+                sconto: couponDetails.discount,
+                prezzo: couponDetails.price,
+                descrizione: couponDetails.description,
+            };
+            const couponButton = createCouponButton(couponData, true);
+            // Aggiungi un attributo per trovare il bottone dopo la rimozione
+            couponButton.setAttribute('data-wishlist-id', wishlistedCoupons[idx].self.split('/').pop());
+            couponList.appendChild(couponButton);
+        });
+    };
+
+    // Funzione per gestire il click sul cuore nel modal
+    wishlistHeart.onclick = async () => {
+        const productSelf = modal.getAttribute('data-product-id');
+        const isFavorite = modal.getAttribute('data-is-favorite') === 'true';
+
+        if (isFavorite) {
+            // Rimuovi dai preferiti
+            const wishlistedCoupons = await apiRequest(`${apiBaseUrl}/users/${userId}/wishlistedCoupons`);
+            const couponToRemove = wishlistedCoupons.find(coupon => coupon.couponPrototype.split('/').pop() === productSelf.split('/').pop());
+            if (couponToRemove) {
+                const wishself = couponToRemove.self.split('/').pop();
+                const success = await apiRequest(`${apiBaseUrl}/users/${userId}/wishlistedCoupons/${wishself}`, 'DELETE');
+                if (success) {
+                    await updateUserScore();
+                    // Aggiorna entrambe le liste
+                    await loadWishlistedCoupons();
+                    await loadCoupons();
+                } else {
+                    console.log('Errore nella rimozione dai preferiti');
+                }
+            }
+        } else {
+            // Aggiungi ai preferiti
+            const success = await apiRequest(`${apiBaseUrl}/users/${userId}/wishlistedCoupons`, 'POST', { couponPrototype: productSelf });
+            if (success) {
+                await updateUserScore();
+                // Aggiorna entrambe le liste
+                await loadWishlistedCoupons();
+                await loadCoupons();
+            } else {
+                console.log('Errore nell\'aggiunta ai preferiti');
+            }
+        }
+
+        closeModal();
+    };
+
+    // Funzione per acquistare un coupon
+    buyButton.onclick = async () => {
+        const productSelf = modal.getAttribute('data-product-id');
+        console.log("productSelf buy:" + productSelf.split("/").pop());
+        const success = await apiRequest(`${apiBaseUrl}/users/${userId}/coupons`, 'POST', { couponPrototype: productSelf.split("/").pop() });
+        if (success) {
+            alert('Hai comprato il prodotto!');
+            await updateUserScore();
+            loadCoupons();
+        } else {
+            alert('Errore nell\'acquisto del prodotto');
+        }
+        closeModal();
+    };
+
+    // Inizializza il caricamento dei dati
     const initialize = async () => {
+        await updateUserScore();
         await loadCoupons();
         await loadWishlistedCoupons();
     };
 
     initialize();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const userPoints = localStorage.getItem('UserPoints');
+    const pointsDiv = document.getElementById('userPoints');
+    if (userPoints !== null) {
+        pointsDiv.textContent = `Punti: ${userData.points}`;
+    } else {
+         
+         pointsDiv.textContent = `Punti: ${userData.points}`;
+    }
 });

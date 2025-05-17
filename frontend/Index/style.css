@@ -1,48 +1,75 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(90deg, #e3e4e8 0%, #f3f4f6 100%);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #1e3c72;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: 0;
-    background: linear-gradient(500deg, #e6f2ff, #c1d3ff);
-    color: #333;
 }
 
 .container {
     text-align: center;
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    color: #1e3c72;
 }
 
 h1 {
     margin-bottom: 30px;
-    color: #0056b3;
+    color: #1e3c72;
+    font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .button-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 20px;
+    padding: 20px;
 }
 
 .styled-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 15px 30px;
-    background-color: #007BFF;
-    color: white;
+    background: linear-gradient(90deg,#2a5298  0%, #1e3c72 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.2s;
 }
 
 .styled-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    transform: translateY(-2px) scale(1.04);
 }
 
 .styled-button:active {
     transform: scale(0.95);
+}
+
+@media (max-width: 600px) {
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
 }

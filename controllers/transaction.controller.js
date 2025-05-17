@@ -36,20 +36,11 @@ const postTransaction=async(req,res,next)=>{
                     //logica per cui un utente non può consegnare piu di MAX al giorno
 
                     const todayPoints=await fetchPoints("/api/v1/users/"+providedUser,Date.now());
-                    if(todayPoints>=MAX){
-                        console.log("No points added");
-
-                        // RISPOSTA.......................
-
-                    }
-                    else{
-                        const pointsToAdd=todayPoints+providedCollected>MAX?(MAX-todayPoints):(providedCollected);
-                        await User.findByIdAndUpdate(providedUser,{$inc:{points:MAX-todayPoints}});
-                        // if(todayPoints+providedCollected>MAX){
-                        //     await User.findByIdAndUpdate(providedUser,{$inc:{points:MAX-todayPoints}});
-                        //     console.log("Daily quota reached");
-                        // }else
-                        //     await User.findByIdAndUpdate(providedUser,{$inc:{points:providedCollected}});
+                    console.log(todayPoints+"("+MAX+")");
+                    if(todayPoints<MAX){
+                        const pointsToAdd=(todayPoints+providedCollected)>MAX?(MAX-todayPoints):(providedCollected);
+                        console.log(" ======> "+pointsToAdd);
+                        await User.findByIdAndUpdate(providedUser,{$inc:{points:pointsToAdd}});
                     }
                     
                     //-------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 @atkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYyZjA4OTQ5OTc5YTlmNzc0ZmQ0MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzY3OTA4NiwiZXhwIjoxNzQzNzY1NDg2fQ.k2TI_jfPkq9it-MvmeUDYiW38_maqvZqgSTApfQ2nQA
 
 # User1
-@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlM2NlODAwNzBlMjdjYzk2NjM5MSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjc5MTI1LCJleHAiOjE3NDM3NjU1MjV9.SXmJbBcVFSiqDXi2SuQT_66tLrWwtpV0Sp_977OsffU
+@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlM2NlODAwNzBlMjdjYzk2NjM5MSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQ3NDczNjEwLCJleHAiOjE3NDc1NjAwMTB9.q6dRsNWbaIH_FgmR-wZl50k40p6a0OGiTXXlo1O4m4A
 @u1id=67dee3ce80070e27cc966391
 
 # User2
@@ -303,7 +303,7 @@ GET http://localhost:3000/api/v1/users/{{u1id}}/transactions/collected
 Authorization: Bearer {{atkn}}
 ###
 # User1
-GET http://localhost:3000/api/v1/users/{{u1id}}/transactions/collected
+GET http://localhost:3000/api/v1/users/{{u1id}}/transactions/collected?date=1747474030
 Authorization: Bearer {{u1tkn}}
 ###
 # User2
@@ -396,7 +396,7 @@ content-type: application/json
 {
     "user":"/api/v1/users/{{u1id}}",
     "machine":"/api/v1/machines/{{mid}}",
-    "collected":1000
+    "collected":10
 }
 
 ###

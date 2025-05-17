@@ -8,28 +8,30 @@
 </head>
 <body>
     <header>
-        <a href="/Home/home.html" class="home-arrow">← Home</a>
-        <h1>Supporto Clienti</h1>
+        <a href="/Home/home.html" class="home-arrow">☜ Home</a>
     </header>
-    <section id="contatti">
-        <h2>Contatti</h2>
-        <p>Email: supporto@azienda.com</p>
-        <p>Numero di telefono: 123-456-7890</p>
-    </section>
-    <section id="ticket">
-        <h2>Invia un Ticket di Supporto</h2>
-        <form id="ticketForm">
-            <label for="categoria">Categoria:</label>
-            <select id="categoria" name="categoria">
-                <option value="problema_tecnico">Problema Tecnico</option>
-                <option value="domanda_commerciale">Domanda Commerciale</option>
-                <option value="altro">Altro</option>
-            </select>
-            <label for="descrizione">Descrizione del problema:</label>
-            <textarea id="descrizione" name="descrizione" required></textarea>
-            <button type="submit">Invia</button>
-        </form>
-    </section>
+    <main class="support-container">
+        <h1 class="support-title">Supporto Clienti</h1>
+        <section class="support-section" id="contatti">
+            <h2>Contatti</h2>
+            <p>Email: supporto@azienda.com</p>
+            <p>Numero di telefono: 123-456-7890</p>
+        </section>
+        <section class="support-section" id="ticket">
+            <h2>Invia un Ticket di Supporto</h2>
+            <form id="ticketForm">
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria">
+                    <option value="problema_tecnico">Problema Tecnico</option>
+                    <option value="domanda_commerciale">Domanda Commerciale</option>
+                    <option value="altro">Altro</option>
+                </select>
+                <label for="descrizione">Descrizione del problema:</label>
+                <textarea id="descrizione" name="descrizione" required></textarea>
+                <button type="submit">Invia</button>
+            </form>
+        </section>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
