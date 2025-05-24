@@ -25,10 +25,12 @@ async function fetchUserData() {
 async function fetchDailyCollected() {
     const token = localStorage.getItem('Token');
     const today = new Date();
-    // Data odierna in formato YYYYMMDD come richiesto dall'API
-    const dayInt = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+   
+    
+   
+    
     try {
-        const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${id}/transactions/collected?day=${new Date()}`, {
+        const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${id}/transactions/collected?day=${today.getTime()}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
