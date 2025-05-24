@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Document is ready");
 
     const languageSelector = document.getElementById('language');
-    const authKey = "50f80a6e-c8dd-b682-b1c4-c4040da3bef4:fx";//ATTENZIONEEEEEE
+    const authKey = "?es";//ATTENZIONEEEEEE
 
     const userId = localStorage.getItem("Id");
     const accessToken = localStorage.getItem('Token');
