@@ -8,6 +8,13 @@ body {
     display: block;
 }
 
+h1 {
+    color: #1e3c72;
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 header {
     width: 100%;
     background: #1e3c72;

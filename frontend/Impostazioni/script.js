@@ -2,7 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Document is ready");
 
     const languageSelector = document.getElementById('language');
-    const authKey = "?es";//ATTENZIONEEEEEE
+
+    // Salva la lingua selezionata nelle impostazioni
+    languageSelector.addEventListener('change', async (e) => {
+        localStorage.setItem('preferredLanguage', e.target.value);
+        alert("Lingua cambiata");
+        await translatePage(e.target.value);
+    });
+
+    // Recupera la lingua preferita dalle impostazioni (localStorage)
+    const preferredLanguage = localStorage.getItem('preferredLanguage') || 'it';
+
+    // Traduci la pagina automaticamente se la lingua non è italiano
+    if (preferredLanguage && preferredLanguage !== 'it') {
+        translatePage(preferredLanguage);
+        if (languageSelector) languageSelector.value = preferredLanguage;
+    }
 
     const userId = localStorage.getItem("Id");
     const accessToken = localStorage.getItem('Token');
@@ -14,13 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Funzione per tradurre il testo utilizzando l'API di DeepL
+    // Funzione per tradurre il testo usando Google Translate unofficial API
     const translateText = async (text, targetLang) => {
-        const url = `https://api-free.deepl.com/v2/translate?auth_key=${authKey}&text=${encodeURIComponent(text)}&target_lang=${targetLang.toUpperCase()}`;
         try {
-            const response = await fetch(url);
+            const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
             const result = await response.json();
-            return result.translations[0].text;
+            return result[0][0][0];
         } catch (error) {
             console.error('Errore nella traduzione:', error);
             return text;
@@ -28,20 +42,19 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Funzione per tradurre tutti i nodi di testo della pagina
-    const translatePage = async (language) => {
+    async function translatePage(language) {
         const textNodes = [];
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
         let node;
 
         while (node = walker.nextNode()) {
-            // Escludi il nodo contenente il selettore delle lingue
             if (!node.parentElement.closest('#language-selector')) {
                 textNodes.push(node);
             }
         }
 
         const translations = await Promise.all(textNodes.map(async (textNode) => {
-            if (textNode.nodeValue.trim().length > 0) { // Traduci solo nodi non vuoti
+            if (textNode.nodeValue.trim().length > 0) {
                 const translatedText = await translateText(textNode.nodeValue, language);
                 return { textNode, translatedText };
             } else {
@@ -54,14 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         console.log("Page translated:", translations);
-    };
-
-    // Cambia lingua al cambio di selezione
-    languageSelector.addEventListener('change', async (e) => {
-        console.log("Language selector changed");
-        alert("Lingua cambiata");
-        await translatePage(e.target.value);
-    });
+    }
 
     // Funzione per cambiare la password
     const changePassword = async () => {

@@ -7,12 +7,12 @@ function getNameFromEmail(email) {
 async function postData(email, password) {
     const name = getNameFromEmail(email);
     const data = {
+        email: email, 
         name: name,
-        password: password
     };
 
     try {
-        const response = await fetch('http://127.0.0.1:3000', {
+        const response = await fetch('http://127.0.0.1:3000/api/v1/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
