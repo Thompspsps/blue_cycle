@@ -128,6 +128,15 @@ const patchUserById=async (req,res,next)=>{
                         //modifiedUser.password=providedNewPassword;
                         delete modifiedUser._id;
                         res.locals.response={status:200,success:true,message:"Updated successfully",data:modifiedUser};
+                        res.locals.response={status:201,success:true,message:"New user registered",data:createdUser};
+                        await transporter.sendMail({
+                            from: senderAddress, // sender address
+                            to: user.email, // list of receivers
+                            subject: "Password modificata", // Subject line
+                            text: "La tua password è stata aggiornata con successo!",
+                        })
+                        .then(()=>console.log("New user created. Email sent"))
+                        .catch(()=>console.log("Something went wrong"));
                     }
                 }else
                     res.locals.response={status:400,success:false,message:"Bad request",data:null};
