@@ -191,6 +191,33 @@ button:active {
     color: #ffcc00;
 }
 
+/* Stili per i requisiti della password */
+.password-requirements {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.password-requirements p {
+    margin: 0 0 8px 0;
+    color: #1e3c72;
+    font-weight: bold;
+}
+
+.password-requirements ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #6c757d;
+}
+
+.password-requirements li {
+    margin-bottom: 4px;
+}
+
 @keyframes modalFadeIn {
     from { opacity: 0; transform: translateY(-40px);}
     to { opacity: 1; transform: translateY(0);}
