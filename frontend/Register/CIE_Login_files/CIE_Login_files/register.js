@@ -1,3 +1,33 @@
+// Carica gli utenti dal file nome.json
+let cieUsers = [];
+
+// Carica gli utenti CIE all'avvio
+async function loadCIEUsers() {
+    try {
+        const response = await fetch('./nome.json');
+        cieUsers = await response.json();
+        console.log('Utenti CIE caricati:', cieUsers.length);
+    } catch (error) {
+        console.error('Errore nel caricamento degli utenti CIE:', error);
+    }
+}
+
+// Simula l'autenticazione CIE
+function simulateCIEAuth(email, password) {
+    const user = cieUsers.find(u => u.email === email && u.password === password);
+    if (user) {
+        return {
+            success: true,
+            message: 'Autenticazione CIE riuscita',
+            user: user
+        };
+    }
+    return {
+        success: false,
+        message: 'Credenziali CIE non valide'
+    };
+}
+
 // Funzione che estrae il nome dalla email
 function getNameFromEmail(email) {
     return email.split('@')[0];
@@ -46,8 +76,19 @@ function procedi() {
         return;
     }
 
-    postData(email, password);
+    // Simula prima l'autenticazione CIE
+    const cieAuth = simulateCIEAuth(email, password);
+    
+    if (cieAuth.success) {
+        alert('Autenticazione CIE riuscita! Procedo con la registrazione nel sistema BlueCycle.');
+        postData(email, password);
+    } else {
+        alert('Errore CIE: ' + cieAuth.message + '\nVerifica le credenziali CIE e riprova.');
+    }
 }
 
 // Aggiunge l'evento di click al bottone "Procedi"
 document.getElementById('proceedButton').addEventListener('click', procedi);
+
+// Carica gli utenti CIE all'avvio della pagina
+document.addEventListener('DOMContentLoaded', loadCIEUsers);
