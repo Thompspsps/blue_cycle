@@ -53,9 +53,34 @@ function populateUserDetails(userData) {
         console.error('I dati utente non sono disponibili.');
         return;
     }
-    arrayname = userData.name.split(" ");
-    document.getElementById('user-name').textContent = arrayname[0] || 'NomeUtente';
-    document.getElementById('user-surname').textContent = arrayname[1] || 'CognomeUtente';
+    
+    // Debug: mostra la struttura dei dati ricevuti
+    console.log('Dati utente ricevuti:', userData);
+    console.log('Campo name:', userData.name);
+    
+    // Gestisce il nome completo dal campo 'name' (es. "Mario Rossi")
+    let nome = 'NomeUtente';
+    let cognome = 'CognomeUtente';
+    
+    if (userData.name && typeof userData.name === 'string') {
+        const arrayname = userData.name.trim().split(" ");
+        console.log('Array nome dopo split:', arrayname);
+        
+        nome = arrayname[0] || 'NomeUtente';
+        // Se ci sono più parti, prende tutto tranne la prima come cognome
+        if (arrayname.length > 1) {
+            cognome = arrayname.slice(1).join(" ");
+        } else {
+            // Se c'è solo una parola, la usiamo sia come nome che cognome
+            cognome = arrayname[0] || 'CognomeUtente';
+        }
+    }
+    
+    console.log('Nome estratto:', nome);
+    console.log('Cognome estratto:', cognome);
+    
+    document.getElementById('user-name').textContent = nome;
+    document.getElementById('user-surname').textContent = cognome;
     document.getElementById('user-id').textContent = userData.code || '';
     document.getElementById('user-email').textContent = userData.email || '';
     // Se il punteggio è N/A o falsy, mostra 0

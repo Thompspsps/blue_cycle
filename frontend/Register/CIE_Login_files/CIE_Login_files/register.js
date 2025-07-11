@@ -32,8 +32,7 @@ function simulateCIEAuth(email, password) {
 async function postData(email, password, user) {
     const data = {
         email: email, 
-        name: user.nome,
-        surname: user.cognome
+        name: `${user.nome} ${user.cognome}`
     };
 
     try {
