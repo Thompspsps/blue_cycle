@@ -28,17 +28,12 @@ function simulateCIEAuth(email, password) {
     };
 }
 
-// Funzione che estrae il nome dalla email
-function getNameFromEmail(email) {
-    return email.split('@')[0];
-}
-
 // Funzione che effettua una chiamata fetch POST al server locale
-async function postData(email, password) {
-    const name = getNameFromEmail(email);
+async function postData(email, password, user) {
     const data = {
         email: email, 
-        name: name,
+        name: user.nome,
+        surname: user.cognome
     };
 
     try {
@@ -81,7 +76,7 @@ function procedi() {
     
     if (cieAuth.success) {
         alert('Autenticazione CIE riuscita! Procedo con la registrazione nel sistema BlueCycle.');
-        postData(email, password);
+        postData(email, password, cieAuth.user);
     } else {
         alert('Errore CIE: ' + cieAuth.message + '\nVerifica le credenziali CIE e riprova.');
     }
