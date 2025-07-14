@@ -63,7 +63,7 @@ POST http://localhost:3000/api/v1/users
 content-type: application/json
 
 {
-    "email":"mariorossi@example.com",
+    "email":"rossi@example.com",
     "name":"Mario Rossi"
 }
 

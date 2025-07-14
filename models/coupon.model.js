@@ -1,18 +1,26 @@
-// to do
-// rimuovere dalle dipendenze uuid e voucher-code-generator
-
 const {Schema,model}=require("mongoose");
 // const {v4:uuidv4}=require('uuid'); da tohgliere
 // const voucher_codes=require("voucher-code-generator");
 // const {nanoid}=require("nanoid");
-let customAlphabet;
-(async()=>{
-    const nanoidModule=await import("nanoid");
-    customAlphabet=nanoidModule.customAlphabet;
-})();
+// let customAlphabet;
+// (async()=>{
+//     const nanoidModule=await import("nanoid");
+//     customAlphabet=nanoidModule.customAlphabet;
+// })();
+
+// const { customAlphabet } = require('nanoid');
+const nanoid=require("nanoid");
 
 const alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const fixedLength=10; // all codes have fixed length
+const fixedLength=10; // all codes must have fixed length
+
+
+const generateCode=()=>{
+    let result = '';
+    for (let i=0;i<fixedLength;i++)
+        result+=alphabet.charAt(Math.floor(Math.random()*alphabet.length));
+    return result;
+};
 
 const set31DaysFromNow=()=>{
     const today=Math.trunc(Date.now()/1000);
@@ -30,7 +38,8 @@ const couponSchema=Schema(
         code:{
             type: String,
             unique:true,
-            default:()=>customAlphabet(alphabet,fixedLength)()
+            // default:()=>customAlphabet(alphabet,fixedLength)()
+            default: generateCode
         },
         store:{
             type: String,

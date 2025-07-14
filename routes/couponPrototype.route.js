@@ -3,13 +3,13 @@ const couponPrototypeRouter=express.Router();
 
 const {
     getCouponPrototypes,
-    getCouponProrotypeById,
+    getCouponPrototypeById,
     postCouponPrototype,
     deleteCouponPrototypeById
 }=require("../controllers/couponPrototype.controller");
 
 couponPrototypeRouter.get("/",getCouponPrototypes);
-couponPrototypeRouter.get("/:id",getCouponProrotypeById);
+couponPrototypeRouter.get("/:id",getCouponPrototypeById);
 couponPrototypeRouter.post("/",postCouponPrototype);
 couponPrototypeRouter.delete("/:id",deleteCouponPrototypeById);
 

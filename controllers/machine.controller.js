@@ -1,6 +1,3 @@
-// to do
-// togliere campi superflui(__v)
-
 const {Machine,Transaction}=require("../models/bc.models");
 const {authenticateToken}=require("../scripts/tokenChecker");
 const {fetchPoints}=require("../scripts/pointsFetcher");
@@ -31,7 +28,7 @@ const getMachines=async (req,res,next)=>{
                     };
                 }
             }
-            console.log(filters);
+            // console.log(filters);
             let machines=await Machine.find(filters).select("-position._id");
             machines=machines.map((entry)=>{
                 entry=entry.toObject();
@@ -55,7 +52,6 @@ const getMachineById=async (req,res,next)=>{
     try{
         if(await authenticateToken(req,res,["user","admin"])){
             const {id}=req.params;
-            //controllo conformità dell'id fornito
             if(!mongoose.Types.ObjectId.isValid(id))
                 res.locals.response={status:400,success:false,message:"Not valid id",data:null};
             else{

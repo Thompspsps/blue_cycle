@@ -1,19 +1,19 @@
-//to do:
-//aggiungere la validazione dell'indirizzo email
-// aggiungere un controllo in pre(findOneAndUpdate) se la password è stata cambiata
-
 const {Schema,model}=require("mongoose");
 // const {customAlphabet}=require("nanoid");
 
 // dynamic import per nanoid
-let customAlphabet;
-(async()=>{
-    const nanoidModule=await import("nanoid");
-    customAlphabet=nanoidModule.customAlphabet;
-})();
+// let customAlphabet;
+// (async()=>{
+//     const nanoidModule=await import("nanoid");
+//     customAlphabet=nanoidModule.customAlphabet;
+// })();
+
+// const { customAlphabet } = require('nanoid');
+
+const nanoid=require("nanoid");
 
 const alphabet="0123456789";
-const fixedLength=10; // all codes have fixed length
+const fixedLength=10; // all codes must have fixed length
 
 const bcrypt=require("bcrypt");
 require("dotenv").config();
@@ -31,6 +31,13 @@ const passwordSchema=new Schema({
     }
 });
 
+const generateCode=()=>{
+    let code='';
+    for(let i=0;i<fixedLength;i++)
+        code += Math.floor(Math.random()*10); // Aggiunge una cifra da 0 a 9
+    return code;
+}
+
 const userSchema=Schema(
     {
         code:{
@@ -38,7 +45,8 @@ const userSchema=Schema(
             unique: true,
             required: true,
             // default:codeGenerator(fixedLength)
-            default:()=>customAlphabet(alphabet,fixedLength)()
+            // default:()=>customAlphabet(alphabet,fixedLength)()
+            default: generateCode 
         },
         email:{
             type: String,
@@ -77,7 +85,8 @@ userSchema.pre("save",async function(next){
         while(await User.findOne({code:this.code})){
             // generate a new code
             // this.code=codeGenerator(fixedLength); 
-            this.code=customAlphabet(alphabet,fixedLength)();
+            // this.code=customAlphabet(alphabet,fixedLength)();
+            this.code=generateCode();
         }
         next();
     }catch(err){

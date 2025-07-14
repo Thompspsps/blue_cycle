@@ -1,6 +1,3 @@
-// to do:
-// aggiungere validazione dell'email, con regex o validator
-
 const {Schema,model}=require("mongoose");
 const bcrypt=require("bcrypt");
 require("dotenv").config();

@@ -1,7 +1,3 @@
-// to do
-// rimuovere dalla visualizzazione campi superflui(__v)
-// discutere con il resto del gruppo se notificare l'utente in caso di raggiungimento di quota giornaliera
-
 const {User,Machine,Transaction}=require("../models/bc.models");
 const {authenticateToken}=require("../scripts/tokenChecker");
 const mongoose=require("mongoose");
@@ -20,9 +16,10 @@ const postTransaction=async(req,res,next)=>{
 
         if(
             !mongoose.Types.ObjectId.isValid(providedUser)|| 
-            !mongoose.Types.ObjectId.isValid(providedMachine)|| 
+            !mongoose.Types.ObjectId.isValid(providedMachine)||
+            !providedCollected|| 
             typeof(providedCollected)!=="number"|| 
-            providedCollected<0
+            providedCollected<=0
         )
             res.locals.response={status:400,success:false,message:"Bad request",data:null};
         else{
@@ -36,17 +33,18 @@ const postTransaction=async(req,res,next)=>{
                     //logica per cui un utente non può consegnare piu di MAX al giorno
 
                     const todayPoints=await fetchPoints("/api/v1/users/"+providedUser,Date.now());
-                    console.log(todayPoints+"("+MAX+")");
+                    // console.log(todayPoints+"("+MAX+")");
                     if(todayPoints<MAX){
                         const pointsToAdd=(todayPoints+providedCollected)>MAX?(MAX-todayPoints):(providedCollected);
-                        console.log(" ======> "+pointsToAdd);
+                        // console.log(" ======> "+pointsToAdd);
                         await User.findByIdAndUpdate(providedUser,{$inc:{points:pointsToAdd}});
                     }
                     
                     //-------------------------------------------------------------------------------
                     let transaction=new Transaction({user:providedUser,machine:providedMachine,date:providedDate,collected:providedCollected});
-                    await transaction.save();
+                    transaction=await transaction.save();
                     transaction=transaction.toObject();
+                    // console.log(transaction);
                     transaction.self="/api/v1/transactions/"+transaction._id;
                     transaction.user="/api/v1/users/"+providedUser;
                     transaction.machine="/api/v1/machines/"+providedMachine;

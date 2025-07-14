@@ -5,11 +5,11 @@ const mongoose=require("mongoose");
 const getCouponPrototypes=async (req,res,next)=>{
     try{
         if(await authenticateToken(req,res,["user","admin"])){
-            const {store:queryStore,pricec:queryPrice,discount:queryDiscount}=req.query;
+            const {store:queryStore,price:queryPrice,discount:queryDiscount}=req.query;
             const filters={};
-            if(queryStore) filters.store=queryStore;
-            if(typeof(queryPrice)==="number") filters.price=queryPrice;
-            if(typeof(queryDiscount)==="number") filters.discount=queryDiscount;                //controllo se sono definiti i filtri
+            if (queryStore) filters.store=queryStore;
+            if (queryPrice && !isNaN(queryPrice)) filters.price={$lte:Number(queryPrice)};
+            if (queryDiscount && !isNaN(queryDiscount)) filters.discount = Number(queryDiscount);
             let couponPrototypes=await CouponPrototype.find(filters);
             couponPrototypes=couponPrototypes.map((entry)=>{
                 return{
@@ -29,7 +29,7 @@ const getCouponPrototypes=async (req,res,next)=>{
     next();
 };
 
-const getCouponProrotypeById=async(req,res,next)=>{
+const getCouponPrototypeById=async(req,res,next)=>{
     try{
         const {id}=req.params;
         if(!mongoose.Types.ObjectId.isValid(id))
@@ -41,7 +41,7 @@ const getCouponProrotypeById=async(req,res,next)=>{
             else{
                 if(await authenticateToken(req,res,["user","admin"])){
                     coupon=coupon.toObject();
-                    coupon.self="/api/v1/couponPrototypes/"+coupon._id;
+                    coupon.self="/api/v1/couponPrototypes/"+id;
                     delete coupon._id;
                     res.locals.response={status:200,success:true,message:"OK",data:coupon};
                 }
@@ -54,7 +54,7 @@ const getCouponProrotypeById=async(req,res,next)=>{
     next();
 }
 
-//magari aggiungere una getCouponProrotypeById
+//magari aggiungere una getCouponPrototypeById
 
 const postCouponPrototype=async (req,res,next)=>{
     try{
@@ -89,7 +89,6 @@ const deleteCouponPrototypeById=async (req,res,next)=>{
                 const deletedItem=await CouponPrototype.findByIdAndDelete(providedItemId);
                 if(!deletedItem)
                     res.locals.response={status:404,success:false,message:"Not Found",data:null};
-                // non mostra contenuto json stranamente
                 else
                     res.locals.response={status:200,success:true,message:"Deleted",data:null};
             }
@@ -103,7 +102,7 @@ const deleteCouponPrototypeById=async (req,res,next)=>{
 
 module.exports={
     getCouponPrototypes,
-    getCouponProrotypeById,
+    getCouponPrototypeById,
     postCouponPrototype,
     deleteCouponPrototypeById
 };

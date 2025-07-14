@@ -1,7 +1,3 @@
-// to do:
-// aggiungere la funzionalità nel model che faccia l'hash della password(invece di farlo nelle funzioni stesse, e.g. patchuserbyid)
-// risolvere il problema in patchuserbyid che restituisce la password in chiaro(ma salvata con hash nel db)
-
 const {User,WishlistedCoupon,Coupon,Transaction,CouponPrototype}=require("../models/bc.models");
 const {authenticateToken}=require("../scripts/tokenChecker");
 const {fetchPoints}=require("../scripts/pointsFetcher");
@@ -56,7 +52,7 @@ const postUser=async (req,res,next)=>{
                 // console.log(createdUser.password);
                 const tpassword=createdUser.password.content;
                 console.log("---------->",tpassword);
-                await createdUser.save();
+                createdUser=await createdUser.save();
                 createdUser=createdUser.toObject();
                 createdUser.self="/api/v1/users/"+createdUser._id;
                 delete createdUser._id;
@@ -115,7 +111,7 @@ const patchUserById=async (req,res,next)=>{
         else{
             const user=await User.findById(id);
             if(!user)
-                res.locals.response={status:404,success:false,message:"Bad request",data:null};
+                res.locals.response={status:404,success:false,message:"Not found",data:null};
             else{
                 console.log(req.body);
                 const {oldPassword:providedOldPassword,newPassword:providedNewPassword}=req.body;
@@ -128,14 +124,13 @@ const patchUserById=async (req,res,next)=>{
                         //modifiedUser.password=providedNewPassword;
                         delete modifiedUser._id;
                         res.locals.response={status:200,success:true,message:"Updated successfully",data:modifiedUser};
-                        res.locals.response={status:201,success:true,message:"New user registered",data:createdUser};
                         await transporter.sendMail({
                             from: senderAddress, // sender address
                             to: user.email, // list of receivers
                             subject: "Password modificata", // Subject line
                             text: "La tua password è stata aggiornata con successo!",
                         })
-                        .then(()=>console.log("New user created. Email sent"))
+                        .then(()=>console.log("Password modified. Email sent"))
                         .catch(()=>console.log("Something went wrong"));
                     }
                 }else
@@ -149,7 +144,7 @@ const patchUserById=async (req,res,next)=>{
     next();
 };
 
-// da ritestare ------------------------------------------------------------------------------------------------------------------------------------
+
 const getUserByIdCoupons=async (req,res,next)=>{
     try{
         const {id}=req.params;
@@ -202,7 +197,7 @@ const getUserByIdCoupons=async (req,res,next)=>{
     next();
 };
 
-// da ritestare ---------------------------------------------------------------------------------------------
+
 const postUserByIdCoupon=async (req,res,next)=>{
     try{
         const {id}=req.params;
@@ -223,7 +218,7 @@ const postUserByIdCoupon=async (req,res,next)=>{
                         const pointsToSub=couponPrototype.price;
                         try{
                             console.log(user.points,couponPrototype.price);
-                            if(user.points<couponPrototype.price)
+                            if(user.points < couponPrototype.price)
                                 throw new Error("Not enough points");
                             await User.findByIdAndUpdate(id,{$inc:{points:pointsToSub*(-1)}});
                             
@@ -238,9 +233,9 @@ const postUserByIdCoupon=async (req,res,next)=>{
                             res.locals.response={status:201,success:true,message:"Added",data:coupon};
                             await transporter.sendMail({
                                 from: senderAddress, // sender address
-                                to: providedEmail, // list of receivers
+                                to: user.email, // list of receivers
                                 subject: "Ecco il tuo premio", // Subject line
-                                text: "Codice coupon: "+coupon.code+"\nNegozio affiliato: "+coupon.store+"\nSconto: "+coupon.discount+"\nDescrizione: "+coupon.description+"\nDa usare prima del "+moment(coupon.expiration).format("DD-MM-YYYY")
+                                text: "Codice coupon: "+coupon.code+"\nNegozio affiliato: "+coupon.store+"\nSconto: "+coupon.discount+"\nDescrizione: "+coupon.description+"\nDa usare prima del "+moment(coupon.expiration*1000).format("DD-MM-YYYY")
                             })
                             .then(()=>console.log("New coupon created. Email sent"))
                             .catch(()=>console.log("Something went wrong"));
@@ -259,7 +254,7 @@ const postUserByIdCoupon=async (req,res,next)=>{
     next();
 };
 
-// da ritestare -------------------------------------------------------------------------------------------
+
 const getUserByIdWishlistedCoupons=async (req,res,next)=>{
     try{
         const {id}=req.params;
@@ -290,7 +285,7 @@ const getUserByIdWishlistedCoupons=async (req,res,next)=>{
     next();
 };
 
-// da ritestare -----------------------------------------------------------------------------------------------------------------------------------
+
 const postUserByIdWishlistedCoupon=async (req,res,next)=>{
     try{
         const {id}=req.params;
@@ -299,7 +294,7 @@ const postUserByIdWishlistedCoupon=async (req,res,next)=>{
             res.locals.response={status:400,success:false,message:"Bad request",data:null};
         else{
             providedCouponPrototype=providedCouponPrototype.substring(providedCouponPrototype.lastIndexOf('/')+1);
-            console.log(providedCouponPrototype);
+            // console.log(providedCouponPrototype);
             if(!mongoose.Types.ObjectId.isValid(id)||!mongoose.Types.ObjectId.isValid(providedCouponPrototype))
                 res.locals.response={status:400,success:false,message:"Bad request",data:null};
             else{
@@ -311,7 +306,7 @@ const postUserByIdWishlistedCoupon=async (req,res,next)=>{
                     if(await authenticateToken(req,res,["user"],id)){
                         const wishlistedItem=await WishlistedCoupon.findOne({user:id,couponPrototype:providedCouponPrototype})
                         if(wishlistedItem)
-                            res.locals.response={status:209,success:409,message:"Conflict",data:null};
+                            res.locals.response={status:209,success:false,message:"Conflict",data:null};
                         else{
                             let wishlistedCoupon=new WishlistedCoupon({user:id,couponPrototype:providedCouponPrototype});
                             await wishlistedCoupon.save();
@@ -369,7 +364,6 @@ const getUserByIdWishlistedCouponById=async (req,res,next)=>{
 }
 
 
-// da ritestare ---------------------------------------------------------------------------------------------
 const deleteUserByIdWishlistedCouponById=async (req,res,next)=>{
     try{
         const {userId:providedUserId,itemId:providedItemId}=req.params;
@@ -394,7 +388,7 @@ const deleteUserByIdWishlistedCouponById=async (req,res,next)=>{
     next();
 }
 
-// da ritestare -----------------------------------------------------------------------------------------------------------
+
 const getUserByIdTransactions=async (req,res,next)=>{
     try{
         const {id}=req.params;
@@ -458,7 +452,7 @@ module.exports={
     getUserById,
     patchUserById,
     getUserByIdCoupons,
-    // //getUserByIdCouponById --> da aggiungere (forse)
+    //getUserByIdCouponById --> da aggiungere (forse)
     postUserByIdCoupon,
     getUserByIdWishlistedCoupons,
     postUserByIdWishlistedCoupon,
