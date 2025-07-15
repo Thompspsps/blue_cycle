@@ -2,9 +2,17 @@
 const id = localStorage.getItem("Id");
 
 async function fetchUserData() {
-    const token = localStorage.getItem('Token'); // Ottieni il token dal localStorage
+    const token = localStorage.getItem('Token');
+    const id = localStorage.getItem('Id');
+
+    if (!token || !id) {
+        alert('Token o ID mancante. Effettua nuovamente il login.');
+        window.location.href = '/Login/login.html';
+        return null;
+    }
+
     try {
-        const response = await fetch('http://127.0.0.1:3000/api/v1/users/' + id, {
+        const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -24,10 +32,9 @@ async function fetchUserData() {
 // Funzione per ottenere la quantità giornaliera raccolta oggi
 async function fetchDailyCollected() {
     const token = localStorage.getItem('Token');
+    const id = localStorage.getItem('Id');
     const today = new Date();
-   
-    
-   
+    today.setHours(0, 0, 0, 0);
     
     try {
         const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${id}/transactions/collected?day=${today.getTime()}`, {
@@ -127,92 +134,6 @@ document.getElementById('logout').addEventListener('click', function() {
     alert('Logout effettuato!');
     window.location.href = '/Login/login.html'; // Reindirizza alla pagina di login o una pagina a scelta
 });
-
-// Funzione per aprire e chiudere il modale statistiche
-document.getElementById('open-stats-modal').addEventListener('click', async function() {
-    const modal = document.getElementById('stats-modal');
-    const statsContent = document.getElementById('stats-content');
-    modal.style.display = 'block';
-    statsContent.innerHTML = '<p>Caricamento statistiche...</p>';
-
-    const token = localStorage.getItem('Token');
-    const id = localStorage.getItem('Id');
-    const today = new Date();
-    const dayInt = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-
-    try {
-        // Bottiglie totali raccolte
-        const totalRes = await fetch(`http://127.0.0.1:3000/api/v1/transactionstions/collected?id=${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const totalData = await totalRes.json();
-        const totalBottles = (totalData && totalData.data != null) ? totalData.data : 0;
-
-        // Bottiglie raccolte oggi
-        const todayRes = await fetch(`http://127.0.0.1:3000/api/v1/transactionstions/collected?id=${id}&day=${dayInt}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const todayData = await todayRes.json();
-        const todayBottles = (todayData && todayData.data != null) ? todayData.data : 0;
-
-        // Tutte le transazioni dell'utente
-        const transRes = await fetch(`http://127.0.0.1:3000/api/v1/transactions?id=${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const transData = await transRes.json();
-        const transactions = (transData && Array.isArray(transData.data)) ? transData.data : [];
-
-        // Numero totale di transazioni
-        const totalTrans = transactions.length;
-
-        // Ultima raccolta
-        let lastDate = 'N/A';
-        let lastAmount = 'N/A';
-        if (transactions.length > 0) {
-            // Ordina per data decrescente
-            transactions.sort((a, b) => b.date - a.date);
-            const last = transactions[0];
-            lastDate = new Date(last.date * 1000).toLocaleString();
-            lastAmount = last.collected;
-        }
-
-        // Media giornaliera raccolta (opzionale)
-        let mediaGiornaliera = 0;
-        if (transactions.length > 0) {
-            // Raggruppa per giorno
-            const giorni = {};
-            transactions.forEach(tr => {
-                const d = new Date(tr.date * 1000);
-                const key = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-                giorni[key] = (giorni[key] || 0) + tr.collected;
-            });
-            const giorniUnici = Object.keys(giorni).length;
-            mediaGiornaliera = giorniUnici > 0 ? (totalBottles / giorniUnici).toFixed(2) : totalBottles;
-        }
-
-        statsContent.innerHTML = `
-            <p><b>Bottiglie totali raccolte:</b> ${totalBottles}</p>
-            <p><b>Bottiglie raccolte oggi:</b> ${todayBottles}</p>
-            <p><b>Numero totale di conferimenti:</b> ${totalTrans}</p>
-            <p><b>Ultima raccolta:</b> ${lastDate} (${lastAmount} bottiglie)</p>
-            <p><b>Media giornaliera raccolta:</b> ${mediaGiornaliera}</p>
-        `;
-    } catch (err) {
-        statsContent.innerHTML = '<p>Impossibile caricare le statistiche.</p>';
-    }
-});
-
-// Chiudi il modale cliccando sulla X
-document.getElementById('close-stats-modal').onclick = function() {
-    document.getElementById('stats-modal').style.display = 'none';
-};
-// Chiudi il modale cliccando fuori dal contenuto
-window.onclick = function(event) {
-    const modal = document.getElementById('stats-modal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-};
 
 // Funzione principale per eseguire il tutto
 async function main() {

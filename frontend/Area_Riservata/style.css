@@ -188,24 +188,3 @@ footer {
     font-weight: bold;
     text-align: center;
 }
-
-.stats-btn {
-    background: #1e3c72;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 1.3em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.stats-btn:hover {
-    background: #2a5298;
-    transform: scale(1.08);
-}

@@ -27,7 +27,7 @@ var existingMarkers = {}; // Map to track existing markers by coordinates
 
 // Function to fetch machines from the API
 function fetchMachines() {
-    var apiUrl = 'http://localhost:3000/api/v1/machines';
+    var apiUrl = 'http://127.0.0.1.3000/api/v1/machines';
     fetch(apiUrl, {
         headers: {
             'Authorization': `Bearer ${token}`
@@ -152,7 +152,7 @@ function sendFilterRequest(range, from, availability) {
     }
 
     // Log dell'URL per il debug
-    var apiUrl = `http://localhost:3000/api/v1/machines${queryParams}`;
+    var apiUrl = `http://127.0.0.1.3000/api/v1/machines${queryParams}`;
     console.log("API URL con filtro:", apiUrl);
 
     // Effettua la richiesta all'API

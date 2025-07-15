@@ -1,7 +1,7 @@
 // Funzione per autenticare l'utente
 const login = async (username, password) => {
   // Effettua una richiesta POST al server con le credenziali dell'utente
-  const response = await fetch('http://localhost:3000/login', {
+  const response = await fetch('http://127.0.0.1.3000/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json' // Specifica che il corpo della richiesta è in formato JSON
@@ -23,7 +23,7 @@ const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
 
   // Effettua una richiesta POST al server con il token di refresh
-  const response = await fetch('http://localhost:3000/refresh', {
+  const response = await fetch('http://127.0.0.1.3000/refresh', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json' // Specifica che il corpo della richiesta è in formato JSON
@@ -49,7 +49,7 @@ const fetchProtectedData = async () => {
   let token = localStorage.getItem('accessToken');
 
   // Effettua una richiesta GET all'endpoint protetto con il token di accesso nell'header Authorization
-  let response = await fetch('http://localhost:3000/protected', {
+  let response = await fetch('https://blue-cycle-zljn.onrender.com/protected', {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}` // Aggiunge il token di accesso come Bearer token nell'header Authorization
@@ -62,7 +62,7 @@ const fetchProtectedData = async () => {
     token = await refreshAccessToken();
 
     // Riprova la richiesta GET con il nuovo token di accesso
-    response = await fetch('http://localhost:3000/protected', {
+    response = await fetch('https://blue-cycle-zljn.onrender.com/protected', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`

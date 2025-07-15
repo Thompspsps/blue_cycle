@@ -19,10 +19,7 @@
             <div class="detail-item"><strong>ID:</strong> <span id="user-id"></span></div>
             <div class="detail-item"><strong>Email:</strong> <span id="user-email"></span></div>
             <div class="detail-item"><strong>Punteggio:</strong> <span class="user-score"></span></div>
-            <div id="daily-collected-container" style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                <span id="daily-collected" class="daily-collected-info"></span>
-                <button id="open-stats-modal" class="stats-btn" title="Vedi statistiche">📊</button>
-            </div>
+            <div class="detail-item"><strong>Quantità raccolta oggi:</strong> <span id="daily-collected" class="daily-collected-info"></span></div>
             <p><strong>Codice:</strong> <span id="qr-code"></span></p>
             <div class="detail-item">
                 <button id="show-code">Mostra QR Code</button>
@@ -34,22 +31,6 @@
             <button id="logout" class="logout-button">Logout</button>
         </div>
     </main>
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="qrcode-modal" class="qrcode-center"></div>
-        </div>
-    </div>
-    <div id="stats-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" id="close-stats-modal">&times;</span>
-            <h2>Statistiche Raccolta</h2>
-            <div id="stats-content">
-                <!-- Qui verranno mostrate le statistiche -->
-                <p>Caricamento statistiche...</p>
-            </div>
-        </div>
-    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="script.js"></script>

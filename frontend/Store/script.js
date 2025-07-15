@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     userScoreElement.style.marginTop = '20px';
     document.body.insertBefore(userScoreElement, document.body.firstChild);
 
-    const apiBaseUrl = "http://localhost:3000/api/v1";
+    const apiBaseUrl = "http://127.0.0.1.3000/api/v1";
 
     // Funzione per effettuare richieste API
     const apiRequest = async (url, method = 'GET', body = null) => {
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.innerHTML = `
             <div class="coupon-content">
                 <h3>${coupon.nome}</h3>
-                <p>Prezzo: ${coupon.prezzo} €</p>
+                <p>Prezzo: ${coupon.prezzo}</p>
                 <p>Sconto: ${coupon.sconto}%</p>
             </div>
         `;
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
             modalDetails.innerHTML = `
                 <h2>${coupon.nome}</h2>
                 <p><strong>Sconto:</strong> ${coupon.sconto}%</p>
-                <p><strong>Prezzo:</strong> ${coupon.prezzo} €</p>
+                <p><strong>Prezzo:</strong> ${coupon.prezzo}</p>
                 <p><strong>Descrizione:</strong> ${coupon.descrizione}</p>
             `;
             modal.setAttribute('data-product-id', coupon.self);

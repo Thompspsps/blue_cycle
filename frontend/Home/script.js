@@ -1,7 +1,7 @@
 async function fetchUserData() {
     const token = localStorage.getItem('Token'); // Ottieni il token dal localStorage
     try {
-        const response = await fetch('http://127.0.0.1:3000/api/v1/users/' + id, {
+        const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
