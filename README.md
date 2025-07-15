@@ -73,7 +73,7 @@ To easily access the documentation UI, you can use the following endpoint while 
 > http://localhost:3000/api-docs
 ---
 ### Dummy machine
-Since we currently lack physical machines to test transaction registration and point credit functionality, we developed a simulated machine interface for testing purposes. You can access it here:
+Since we currently lack physical machines to test transaction registration and point credit functionality, we developed a simulated machine interface for testing purposes. You can access it here: https://blue-cycle-m.onrender.com/
 
 ---
 ### Registration of a new user
