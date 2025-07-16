@@ -30,7 +30,7 @@ To start the server locally, you can run different npm scripts, which are listed
 
 - npm run run-all
 
-  > concurrently \"npm run debugging\" \" cd frontend && http-server -p 8000
+  > concurrently \"npm run serve\" \" cd frontend && http-server -p 8000
 
   
 
