@@ -13,7 +13,7 @@ $(document).ready(function () {
     // Funzione per ottenere i coupon dall'API
     function getCoupons(used, expired) {
         return $.ajax({
-            url: `http://127.0.0.1.3000/api/v1/users/${userId}/coupons?used=${used}`,
+            url: `http://127.0.0.1:3000/api/v1/users/${userId}/coupons?used=${used}`,
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

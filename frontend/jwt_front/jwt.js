@@ -1,7 +1,7 @@
 // Funzione per autenticare l'utente
 const login = async (username, password) => {
   // Effettua una richiesta POST al server con le credenziali dell'utente
-  const response = await fetch('http://127.0.0.1.3000/login', {
+  const response = await fetch('http://127.0.0.1:3000/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json' // Specifica che il corpo della richiesta è in formato JSON
@@ -23,7 +23,7 @@ const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
 
   // Effettua una richiesta POST al server con il token di refresh
-  const response = await fetch('http://127.0.0.1.3000/refresh', {
+  const response = await fetch('http://127.0.0.1:3000/refresh', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json' // Specifica che il corpo della richiesta è in formato JSON

@@ -34,9 +34,10 @@ async function postData(email, password, user) {
         email: email, 
         name: `${user.nome} ${user.cognome}`
     };
+    
 
     try {
-        const response = await fetch('http://127.0.0.1.3000/api/v1/users', {
+        const response = await fetch('http://127.0.0.1:3000/api/v1/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

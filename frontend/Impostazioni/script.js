@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Funzione per verificare se la password è stata cambiata con successo
     const verifyPasswordChange = async (email, newPassword) => {
         try {
-            const response = await fetch('http://127.0.0.1.3000/api/v1/userAuth', {
+            const response = await fetch('http://127.0.0.1:3000/api/v1/userAuth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1.3000/api/v1/users/${userId}`, {
+            const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

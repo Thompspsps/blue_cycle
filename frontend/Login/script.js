@@ -39,7 +39,7 @@ const login = async () => {
 
     try {
         // Invia la richiesta al server
-        const response = await fetch('http://127.0.0.1.3000/api/v1/userAuth', {
+        const response = await fetch('http://127.0.0.1:3000/api/v1/userAuth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ const login = async () => {
 // Funzione per verificare se la password è temporanea
 const checkTemporaryPassword = async (userId, oldPassword) => {
     try {
-        const response = await fetch(`http://127.0.0.1.3000/api/v1/users/${userId}`, {
+        const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('Token')}`,
@@ -131,7 +131,7 @@ const checkTemporaryPassword = async (userId, oldPassword) => {
 // Funzione per verificare se la password è stata cambiata con successo
 const verifyPasswordChange = async (userId, email, newPassword) => {
     try {
-        const response = await fetch('http://127.0.0.1.3000/api/v1/userAuth', {
+        const response = await fetch('http://127.0.0.1:3000/api/v1/userAuth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ const showChangePasswordModal = (userId, oldPassword, email = null) => {
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1.3000/api/v1/users/${userId}`, {
+            const response = await fetch(`http://127.0.0.1:3000/api/v1/users/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('Token')}`,
@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1.3000/api/v1/forgotPassword', {
+            const response = await fetch('http://127.0.0.1:3000/api/v1/forgotPassword', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
