@@ -17,7 +17,7 @@ info:
     - Retrieve personal details, such as login information and points balance.
     - Change their access credentials.
     - List all coupons acquired through the store and add new ones.
-    - Retrieve all wishlisted coupons, add new ones and remove any wishlisted item from thei account.
+    - Retrieve all wishlisted coupons, add new ones and remove any wishlisted item from their account.
     - Browse the store's available coupons.
     - Acquire new coupons and view their acquired coupons.
     - Review detailed records of their transaction history.
@@ -38,7 +38,7 @@ info:
     ### Authorization and Access
     Each role (user, administrator, or machine) requires the appropriate authorization to interact with specific endpoints.
 
-    This documentation provides comprehensive information for developers and users to use properly BlueCycle API, ensuring efficient operations for both regular users and system administrators.
+    This documentation provides comprehensive information for developers and users to use BlueCycle API properly, ensuring efficient operations for both regular users and system administrators.
 
     All endpoints are categorized by the level of authorization required.
 

@@ -4,12 +4,12 @@
 @atkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmYyZjA4OTQ5OTc5YTlmNzc0ZmQ0MCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc0MzY3OTA4NiwiZXhwIjoxNzQzNzY1NDg2fQ.k2TI_jfPkq9it-MvmeUDYiW38_maqvZqgSTApfQ2nQA
 
 # User1
-@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlM2NlODAwNzBlMjdjYzk2NjM5MSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQ3NDczNjEwLCJleHAiOjE3NDc1NjAwMTB9.q6dRsNWbaIH_FgmR-wZl50k40p6a0OGiTXXlo1O4m4A
-@u1id=67dee3ce80070e27cc966391
+@u1tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NzU4Y2Q0ODVjZmY5NjliM2Q1NzY4NiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzUyNTM0ODA4LCJleHAiOjE3NTI1Mzg0MDh9.b2XEEr7UyAaoSmchxxtsaKb10u1d4d2iqIctb1tBpdg
+@u1id=68758cd485cff969b3d57686
 
 # User2
 @u2tkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ZGVlMzRhODAwNzBlMjdjYzk2NjM4YyIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzNjc5MTA0LCJleHAiOjE3NDM3NjU1MDR9.0j_vCPEdYmC4t0JH32cEv3EPIiUJvFuvdpoGcOL9Pxo
-@u2id=67dee34a80070e27cc96638c
+@u2id=68758d8185cff969b3d57695
 
 # Machine (token staticly generated)
 @mtkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NGRjNjliZjkzZmIxOTE0ODI4NTRiOSIsInJvbGUiOiJtYWNoaW5lIn0.ao5jQmK0cTLAcYcVcTdVl_cxT3KBRQStFq49dDxuoQs
@@ -33,8 +33,8 @@ POST http://localhost:3000/api/v1/userAuth
 content-type: application/json
 
 {
-    "email":"mariorossi@example.com",
-    "password":"noooitsbahamuth"
+    "email":"mario.rossi@example.com",
+    "password":"Noooitsbahamuth!"
 }
 ###
 # User2
@@ -42,8 +42,8 @@ POST http://localhost:3000/api/v1/userAuth
 content-type: application/json
 
 {
-    "email":"toniobianchi@example.com",
-    "password":"itsbahamut"
+    "email":"tonio.bianchi@example.com",
+    "password":"Itsbahamut?"
 }
 
 ###
@@ -63,8 +63,8 @@ POST http://localhost:3000/api/v1/users
 content-type: application/json
 
 {
-    "email":"rossi@example.com",
-    "name":"Mario Rossi"
+    "email":"tonio.bianchi@example.com",
+    "name":"Tonio Bianchi"
 }
 
 ###
@@ -235,7 +235,7 @@ GET http://localhost:3000/api/v1/couponPrototypes
 Authorization: Bearer {{atkn}}
 ###
 # User1
-GET http://localhost:3000/api/v1/couponPrototypes
+GET http://localhost:3000/api/v1/couponPrototypes?price=15
 Authorization: Bearer {{u1tkn}}
 ###
 # User2

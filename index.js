@@ -6,6 +6,8 @@ require("dotenv").config();
 const DB=process.env.DB_URI;
 const PORT=process.env.SERVER_PORT || 3000;
 
+const {Admin}=require("./models/bc.models");
+
 // const createServer=require("./app");
 // const app=createServer();
 
@@ -13,7 +15,7 @@ const app=require("./app");
 
 // connection to mongodb database e startup of express
 mongoose.connect(DB)
-.then(async ()=>{
+.then(async()=>{
     console.log("Connected to mongoDB Cloud");
     app.listen(PORT,"0.0.0.0",()=>console.log("Server is running on port",PORT));
 })

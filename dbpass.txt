@@ -5,14 +5,14 @@
 
 User1
 {
-    "email":"mariorossi@example.com",
-    "password":"noooitsbahamuth"
+    "email":"mario.rossi@example.com",
+    "password":"Noooitsbahamuth!"
 }
 
 User2
 {
-    "email":"toniobianchi@example.com",
-    "password":"itsbahamut"
+    "email":"tonio.bianchi@example.com",
+    "password":"Itsbahamut?"
 }
 
 admin

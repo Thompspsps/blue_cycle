@@ -207,7 +207,7 @@ const postUserByIdCoupon=async (req,res,next)=>{
         else{
             providedCouponPrototype=providedCouponPrototype.substring(providedCouponPrototype.lastIndexOf('/')+1);
             if(!mongoose.Types.ObjectId.isValid(id)||!mongoose.Types.ObjectId.isValid(providedCouponPrototype))
-                res.locals.response={status:400,success:false,message:"Bad request",data:null};
+                res.locals.response={status:400,success:false,message:`Bad request (${providedCouponPrototype},${id})`,data:null};
             else{
                 let user=await User.findById(id);
                 let couponPrototype=await CouponPrototype.findById(providedCouponPrototype);
@@ -304,7 +304,7 @@ const postUserByIdWishlistedCoupon=async (req,res,next)=>{
                     res.locals.response={status:404,success:false,message:"Not found",data:null};
                 else{
                     if(await authenticateToken(req,res,["user"],id)){
-                        const wishlistedItem=await WishlistedCoupon.findOne({user:id,couponPrototype:providedCouponPrototype})
+                        const wishlistedItem=await WishlistedCoupon.findOne({user:id,couponPrototype:providedCouponPrototype});
                         if(wishlistedItem)
                             res.locals.response={status:209,success:false,message:"Conflict",data:null};
                         else{

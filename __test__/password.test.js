@@ -32,10 +32,10 @@ describe("Password Controller Tester",()=>{
         },
         toObject:function(){
             return{
-                email: mockEmail,
-                name: mockName,
-                password:{temporary:true},
-                self: `/api/v1/users/${userId}`
+                email:this.email,
+                name: this.name,
+                password:this.password,
+                self: `/api/v1/users/${this._id}`
             };
         }
     };
@@ -53,19 +53,25 @@ describe("Password Controller Tester",()=>{
         jest.clearAllMocks();
     });
 
-    describe("resetPassword (POST /api/v1/forgotPassword)",()=>{
+    describe("resetPassword (POST /api/v1/forgotPassword )",()=>{
         it("should reset user's password",async()=>{
         
-            const mockExec=jest.fn().mockResolvedValue(mockUser);
-            const mockSelect=jest.fn().mockReturnValue({exec:mockExec});
-            User.findOneAndUpdate = jest.fn().mockReturnValue({
-                select:mockSelect
+            // const mockExec=jest.fn().mockResolvedValue(mockUser);
+            // const mockSelect=jest.fn().mockReturnValue({exec:mockExec});
+            // User.findOneAndUpdate=jest.fn().mockReturnValue({
+            //     select:mockSelect
+            // });
+
+
+
+            User.findOneAndUpdate.mockImplementation(()=>{
+                select:jest.fn().mockResolvedValue(mockUser)
             });
 
             // Mock bcrypt per il pre-hook
             // bcrypt.hash.mockResolvedValue('hashed_tmp_password');
 
-            await resetPassword(mockReq, mockRes, mockNext);
+            await resetPassword(mockReq,mockRes,mockNext);
 
             // Verifica la chiamata a findOneAndUpdate
             expect(User.findOneAndUpdate).toHaveBeenCalledWith(
@@ -99,9 +105,9 @@ describe("Password Controller Tester",()=>{
         });
 
         it("should return 404 if user not found",async()=>{
-            const mockExec = jest.fn().mockResolvedValue(null);
-            const mockSelect = jest.fn().mockReturnValue({exec:mockExec});
-            User.findOneAndUpdate = jest.fn().mockReturnValue({
+            const mockExec=jest.fn().mockResolvedValue(null);
+            const mockSelect=jest.fn().mockReturnValue({exec:mockExec});
+            User.findOneAndUpdate=jest.fn().mockReturnValue({
                 select:mockSelect
             });
 
