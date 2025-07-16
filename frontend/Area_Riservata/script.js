@@ -101,7 +101,7 @@ function showDailyCollected(amount) {
     // Se amount è N/A, null, undefined o falsy, mostra 0
     const value = (amount !== null && amount !== undefined && amount !== 'N/A') ? amount : '0';
     if (dailyDiv) {
-        dailyDiv.textContent = `Quantità raccolta oggi: ${value}`;
+        dailyDiv.textContent = `${value}`;
     }
 }
 
